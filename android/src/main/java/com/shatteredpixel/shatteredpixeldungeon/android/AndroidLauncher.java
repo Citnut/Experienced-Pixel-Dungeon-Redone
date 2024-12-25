@@ -22,7 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package com.shatteredpixel.shatteredpixeldungeon.android;
+package com.shatteredpixel.citnutpixeldungeon.android;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -40,13 +40,13 @@ import com.badlogic.gdx.backends.android.AsynchronousAndroidAudio;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeType;
 import com.badlogic.gdx.utils.GdxNativesLoader;
 import com.rohitss.uceh.UCEHandler;
-import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
-import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
-import com.shatteredpixel.shatteredpixeldungeon.services.news.News;
-import com.shatteredpixel.shatteredpixeldungeon.services.news.NewsImpl;
-import com.shatteredpixel.shatteredpixeldungeon.services.updates.UpdateImpl;
-import com.shatteredpixel.shatteredpixeldungeon.services.updates.Updates;
-import com.shatteredpixel.shatteredpixeldungeon.ui.Button;
+import com.shatteredpixel.citnutpixeldungeon.SPDSettings;
+import com.shatteredpixel.citnutpixeldungeon.ShatteredPixelDungeon;
+import com.shatteredpixel.citnutpixeldungeon.services.news.News;
+import com.shatteredpixel.citnutpixeldungeon.services.news.NewsImpl;
+import com.shatteredpixel.citnutpixeldungeon.services.updates.UpdateImpl;
+import com.shatteredpixel.citnutpixeldungeon.services.updates.Updates;
+import com.shatteredpixel.citnutpixeldungeon.ui.Button;
 import com.watabou.noosa.Game;
 import com.watabou.utils.FileUtils;
 

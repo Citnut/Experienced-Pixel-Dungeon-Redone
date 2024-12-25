@@ -22,7 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package com.shatteredpixel.shatteredpixeldungeon.android;
+package com.shatteredpixel.citnutpixeldungeon.android;
 
 import android.annotation.TargetApi;
 import android.app.backup.BackupAgent;
@@ -30,9 +30,9 @@ import android.app.backup.BackupDataInput;
 import android.app.backup.BackupDataOutput;
 import android.app.backup.FullBackupDataOutput;
 import android.os.ParcelFileDescriptor;
-import com.shatteredpixel.shatteredpixeldungeon.Badges;
-import com.shatteredpixel.shatteredpixeldungeon.Rankings;
-import com.shatteredpixel.shatteredpixeldungeon.journal.Journal;
+import com.shatteredpixel.citnutpixeldungeon.Badges;
+import com.shatteredpixel.citnutpixeldungeon.Rankings;
+import com.shatteredpixel.citnutpixeldungeon.journal.Journal;
 
 import java.io.File;
 

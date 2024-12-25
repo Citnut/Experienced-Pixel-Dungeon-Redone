@@ -7,3 +7,9 @@ dependencies {
     api project(':SPD-classes')
     implementation project(':services')
 }
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}

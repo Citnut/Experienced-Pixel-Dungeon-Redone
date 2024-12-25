@@ -1,13 +1,13 @@
 package com.zrp200.scrollofdebug;
 
-import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
-import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
-import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
-import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
-import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
-import com.shatteredpixel.shatteredpixeldungeon.windows.WndBag;
-import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
+import com.shatteredpixel.citnutpixeldungeon.actors.Actor;
+import com.shatteredpixel.citnutpixeldungeon.items.Item;
+import com.shatteredpixel.citnutpixeldungeon.messages.Messages;
+import com.shatteredpixel.citnutpixeldungeon.scenes.CellSelector;
+import com.shatteredpixel.citnutpixeldungeon.scenes.GameScene;
+import com.shatteredpixel.citnutpixeldungeon.utils.GLog;
+import com.shatteredpixel.citnutpixeldungeon.windows.WndBag;
+import com.shatteredpixel.citnutpixeldungeon.windows.WndOptions;
 import com.watabou.noosa.Game;
 
 import java.lang.reflect.Method;

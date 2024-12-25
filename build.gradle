@@ -18,8 +18,8 @@ buildscript {
 allprojects {
 
     ext {
-        appName = 'Experienced Pixel Dungeon'
-        appPackageName = 'com.trashboxbobylev.experiencedpixeldungeon.redone'
+        appName = 'Citnut PD'
+        appPackageName = 'com.citnut.citnutpixeldungeon'
 
         appVersionCode = 666
         appVersionName = 'ExpPD-2.19.0'

@@ -19,19 +19,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package com.shatteredpixel.shatteredpixeldungeon.ios;
+package com.shatteredpixel.citnutpixeldungeon.ios;
 
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
 import com.badlogic.gdx.backends.iosrobovm.IOSPreferences;
 import com.badlogic.gdx.graphics.glutils.HdpiMode;
-import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
-import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
-import com.shatteredpixel.shatteredpixeldungeon.services.news.News;
-import com.shatteredpixel.shatteredpixeldungeon.services.news.NewsImpl;
-import com.shatteredpixel.shatteredpixeldungeon.services.updates.UpdateImpl;
-import com.shatteredpixel.shatteredpixeldungeon.services.updates.Updates;
+import com.shatteredpixel.citnutpixeldungeon.SPDSettings;
+import com.shatteredpixel.citnutpixeldungeon.ShatteredPixelDungeon;
+import com.shatteredpixel.citnutpixeldungeon.services.news.News;
+import com.shatteredpixel.citnutpixeldungeon.services.news.NewsImpl;
+import com.shatteredpixel.citnutpixeldungeon.services.updates.UpdateImpl;
+import com.shatteredpixel.citnutpixeldungeon.services.updates.Updates;
 import com.watabou.noosa.Game;
 import com.watabou.utils.FileUtils;
 

@@ -1,35 +1,35 @@
 package com.zrp200.scrollofdebug;
 
 import com.badlogic.gdx.utils.StringBuilder;
-import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
-import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
-import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
-import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
-import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
-import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
-import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
-import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
-import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.items.bags.Bag;
-import com.shatteredpixel.shatteredpixeldungeon.items.potions.Potion;
-import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.Scroll;
-import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
-import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
-import com.shatteredpixel.shatteredpixeldungeon.levels.traps.Trap;
-import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
-import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
-import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
-import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
-import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
-import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
-import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
-import com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock;
-import com.shatteredpixel.shatteredpixeldungeon.ui.ScrollPane;
-import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
-import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
-import com.shatteredpixel.shatteredpixeldungeon.windows.WndTextInput;
+import com.shatteredpixel.citnutpixeldungeon.Dungeon;
+import com.shatteredpixel.citnutpixeldungeon.GamesInProgress;
+import com.shatteredpixel.citnutpixeldungeon.ShatteredPixelDungeon;
+import com.shatteredpixel.citnutpixeldungeon.actors.Actor;
+import com.shatteredpixel.citnutpixeldungeon.actors.Char;
+import com.shatteredpixel.citnutpixeldungeon.actors.blobs.Blob;
+import com.shatteredpixel.citnutpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.citnutpixeldungeon.actors.buffs.FlavourBuff;
+import com.shatteredpixel.citnutpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.citnutpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.citnutpixeldungeon.items.Item;
+import com.shatteredpixel.citnutpixeldungeon.items.bags.Bag;
+import com.shatteredpixel.citnutpixeldungeon.items.potions.Potion;
+import com.shatteredpixel.citnutpixeldungeon.items.scrolls.Scroll;
+import com.shatteredpixel.citnutpixeldungeon.levels.Level;
+import com.shatteredpixel.citnutpixeldungeon.levels.Terrain;
+import com.shatteredpixel.citnutpixeldungeon.levels.traps.Trap;
+import com.shatteredpixel.citnutpixeldungeon.messages.Messages;
+import com.shatteredpixel.citnutpixeldungeon.scenes.CellSelector;
+import com.shatteredpixel.citnutpixeldungeon.scenes.GameScene;
+import com.shatteredpixel.citnutpixeldungeon.scenes.PixelScene;
+import com.shatteredpixel.citnutpixeldungeon.sprites.CharSprite;
+import com.shatteredpixel.citnutpixeldungeon.sprites.ItemSpriteSheet;
+import com.shatteredpixel.citnutpixeldungeon.ui.BuffIndicator;
+import com.shatteredpixel.citnutpixeldungeon.ui.RenderedTextBlock;
+import com.shatteredpixel.citnutpixeldungeon.ui.ScrollPane;
+import com.shatteredpixel.citnutpixeldungeon.ui.Window;
+import com.shatteredpixel.citnutpixeldungeon.utils.GLog;
+import com.shatteredpixel.citnutpixeldungeon.windows.WndTextInput;
 import com.watabou.noosa.Game;
 import com.watabou.noosa.ui.Component;
 import com.watabou.utils.Callback;
@@ -46,7 +46,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.shatteredpixel.shatteredpixeldungeon.Dungeon.*;
+import static com.shatteredpixel.citnutpixeldungeon.Dungeon.*;
 import static java.util.Arrays.copyOfRange;
 
 import java.lang.Double;
@@ -70,7 +70,7 @@ public class ScrollOfDebug extends Scroll {
     static String lastCommand = ""; // used with '!!'
 
     /** this is where all the game files are supposed to be located. **/
-    private static final String ROOT = "com.shatteredpixel.shatteredpixeldungeon";
+    private static final String ROOT = "com.shatteredpixel.citnutpixeldungeon";
 
     private enum Command {
         HELP(null, // ...
