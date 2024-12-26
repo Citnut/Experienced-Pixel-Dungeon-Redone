@@ -76,10 +76,10 @@ public class QualityBag extends TreasureBag {
                 items.add(artifact);
             }
 
-            items.add(Generator.randomUsingDefaults(Generator.Category.SCROLL).random());
-            items.add(Reflection.newInstance(ExoticPotion.exoToReg.get(Generator.randomUsingDefaults(Generator.Category.SCROLL).getClass())));
             items.add(Generator.randomUsingDefaults(Generator.Category.POTION).random());
-            items.add(Reflection.newInstance(ExoticScroll.exoToReg.get(Generator.randomUsingDefaults(Generator.Category.POTION).getClass())));
+            items.add(Reflection.newInstance(ExoticPotion.exoToReg.get(Generator.randomUsingDefaults(Generator.Category.POTION).getClass())));
+            items.add(Generator.randomUsingDefaults(Generator.Category.SCROLL).random());
+            items.add(Reflection.newInstance(ExoticScroll.exoToReg.get(Generator.randomUsingDefaults(Generator.Category.SCROLL).getClass())));
 
             items.add(Generator.random(Generator.Category.FOOD));
             items.add(Generator.random(Generator.Category.STONE));

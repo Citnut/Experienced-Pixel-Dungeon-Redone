@@ -40,7 +40,7 @@ public class Reflection {
 	
 	public static <T> T newInstance( Class<T> cls ){
 		try {
-			return ClassReflection.newInstance(cls);
+			return cls == null ? null : ClassReflection.newInstance(cls);
 		} catch (Exception e) {
 			Game.reportException(e);
 			return null;

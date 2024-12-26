@@ -268,12 +268,13 @@ public class Hero extends Char {
 	public void updateHT( boolean boostHP ){
 		long curHT = HT;
 		
-		HT = 20 + 5L*(lvl-1) + HTBoost;
+		HT = 30 + 5L*(lvl-1) + HTBoost;
 		HT += RingOfMight.HTMultiplier(this);
 
 		if (buff(ElixirOfMight.HTBoost.class) != null){
 			HT += buff(ElixirOfMight.HTBoost.class).boost();
 		}
+		HT += StaffOfHoma.HTMultiplier(this);
 		
 		if (boostHP){
 			HP += Math.max(HT - curHT, 0);

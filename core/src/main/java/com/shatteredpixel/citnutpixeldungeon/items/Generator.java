@@ -455,7 +455,7 @@ public class Generator {
 					RatKingArmor.class,
 					VipArmor.class
 			};
-			ARMOR.probs = new float[]{ 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 };
+			ARMOR.probs = new float[]{ 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1 };
 			
 			//see Generator.randomMissile
 			MISSILE.classes = new Class<?>[]{};
@@ -573,12 +573,12 @@ public class Generator {
 	}
 
 	private static final float[][] floorSetTierProbs = new float[][] {
-			{0, 75, 20,  4,  1},
-			{0, 25, 50, 20,  5},
-			{0,  0, 40, 50, 10},
-			{0,  0, 20, 40, 40},
-			{0,  0,  0, 20, 80},
-            {0, 25, 25, 25, 25}
+			{0, 74, 20,  4,  1, 1},
+			{0, 24, 49, 19,  5, 3},
+			{0,  0, 37, 49, 10, 4},
+			{0,  0, 20, 38, 34, 8},
+			{0,  0,  0, 15, 70, 15},
+            {0, 13, 25, 25, 25, 12}
 	};
 
 	private static boolean usingFirstDeck = false;
@@ -722,6 +722,7 @@ public class Generator {
 		} else if (cat.defaultProbs == null || cat == Category.ARTIFACT) {
 			return random(cat);
 		} else if (cat.defaultProbsTotal != null){
+
 			return ((Item) Reflection.newInstance(cat.classes[Random.chances(cat.defaultProbsTotal)])).random();
 		} else {
 			return ((Item) Reflection.newInstance(cat.classes[Random.chances(cat.defaultProbs)])).random();
@@ -784,6 +785,7 @@ public class Generator {
 			Category.MIS_T2,
 			Category.MIS_T3,
 			Category.MIS_T4,
+			Category.MIS_T5,
 			Category.MIS_T5
 	};
 	
