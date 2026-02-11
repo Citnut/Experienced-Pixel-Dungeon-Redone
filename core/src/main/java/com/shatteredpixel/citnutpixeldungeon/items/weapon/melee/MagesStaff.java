@@ -298,12 +298,7 @@ public class MagesStaff extends MeleeWeapon {
 	public String name() {
 		if (wand != null) {
 			if (wand instanceof WandOfUnstable){
-				String glitchy = "¢ÄãćS±«»ùăæǅƆǑʥʄɤȨζϻϡΰѾӫӸףעᵿᶗᵺᶆ";
-				StringBuilder builder = new StringBuilder();
-				for (int i = 0; i < 8; i++){
-					builder.append(glitchy.charAt(Random.Int(glitchy.length())));
-				}
-				return "staff of " + builder.toString();
+				return "staff of " + WandOfUnstable.randomGlitchText(8);
 			}
 			return Messages.get(wand, "staff_name");
 		}

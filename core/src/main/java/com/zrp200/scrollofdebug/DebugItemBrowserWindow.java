@@ -29,6 +29,8 @@ import com.shatteredpixel.citnutpixeldungeon.Chrome;
 import com.shatteredpixel.citnutpixeldungeon.items.Generator;
 import com.shatteredpixel.citnutpixeldungeon.items.Gold;
 import com.shatteredpixel.citnutpixeldungeon.items.Item;
+import com.shatteredpixel.citnutpixeldungeon.sprites.ItemSprite;
+import com.shatteredpixel.citnutpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.citnutpixeldungeon.messages.Messages;
 import com.shatteredpixel.citnutpixeldungeon.mod.ModItemDef;
 import com.shatteredpixel.citnutpixeldungeon.mod.ModManager;
@@ -36,6 +38,7 @@ import com.shatteredpixel.citnutpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.citnutpixeldungeon.scenes.PixelScene;
 import com.shatteredpixel.citnutpixeldungeon.ui.IconButton;
 import com.shatteredpixel.citnutpixeldungeon.ui.Icons;
+import com.watabou.noosa.Image;
 import com.shatteredpixel.citnutpixeldungeon.ui.ItemSlot;
 import com.shatteredpixel.citnutpixeldungeon.ui.RedButton;
 import com.shatteredpixel.citnutpixeldungeon.ui.RenderedTextBlock;
@@ -59,10 +62,15 @@ public class DebugItemBrowserWindow extends Window {
 
 	public interface BrowserItemSource {
 		Item createInstance();
+
 		String displayName();
+
 		String description();
+
 		String sourceId();
+
 		String menuKey();
+
 		boolean isModItem();
 	}
 
@@ -257,9 +265,11 @@ public class DebugItemBrowserWindow extends Window {
 		}
 
 		for (ModManager.ModInfo info : ModManager.listMods()) {
-			if (info == null || !info.enabled) continue;
+			if (info == null || !info.enabled)
+				continue;
 			ModManager.ModData data = ModManager.loadModData(info);
-			if (data == null || data.items == null || data.items.isEmpty()) continue;
+			if (data == null || data.items == null || data.items.isEmpty())
+				continue;
 
 			ArrayList<BrowserItemSource> modSources = new ArrayList<>();
 			for (ModItemDef def : data.items) {
@@ -272,7 +282,7 @@ public class DebugItemBrowserWindow extends Window {
 				String modKey = modMenuKey(info.id);
 				MenuDefinition modMenu = new MenuDefinition(modKey,
 						(info.name == null || info.name.trim().isEmpty()) ? info.id : info.name.trim(),
-						Icons.BACKPACK);
+						Icons.get(Icons.BACKPACK));
 				modMenu.sources.addAll(modSources);
 				menuMap.put(modKey, modMenu);
 			}
@@ -294,7 +304,8 @@ public class DebugItemBrowserWindow extends Window {
 			return byName != 0 ? byName : a.sourceId().compareToIgnoreCase(b.sourceId());
 		});
 		if (!searchSources.isEmpty()) {
-			MenuDefinition searchMenu = new MenuDefinition(SEARCH_MENU_KEY, SEARCH_MENU_LABEL, Icons.MAGNIFY);
+			MenuDefinition searchMenu = new MenuDefinition(SEARCH_MENU_KEY, SEARCH_MENU_LABEL,
+					Icons.get(Icons.MAGNIFY));
 			searchMenu.sources.addAll(searchSources);
 			menus.add(searchMenu);
 		}
@@ -305,7 +316,8 @@ public class DebugItemBrowserWindow extends Window {
 
 		for (MenuDefinition menu : menus) {
 			for (BrowserItemSource source : menu.sources) {
-				if (slotsBySourceId.containsKey(source.sourceId())) continue;
+				if (slotsBySourceId.containsKey(source.sourceId()))
+					continue;
 				BrowserItemSlot slot = new BrowserItemSlot(source);
 				slotsBySourceId.put(source.sourceId(), slot);
 				allSlots.add(slot);
@@ -330,7 +342,8 @@ public class DebugItemBrowserWindow extends Window {
 	}
 
 	private void selectInitialMenu() {
-		if (menus.isEmpty()) return;
+		if (menus.isEmpty())
+			return;
 		if (initialMenuSelection == null) {
 			setSelectedMenu(menus.get(0));
 			return;
@@ -345,7 +358,8 @@ public class DebugItemBrowserWindow extends Window {
 	}
 
 	private void setSelectedMenu(MenuDefinition menu) {
-		if (menu == null || menu == selectedMenu) return;
+		if (menu == null || menu == selectedMenu)
+			return;
 		selectedMenu = menu;
 		if (selectedSlot != null) {
 			selectedSlot.setSelected(false);
@@ -420,7 +434,8 @@ public class DebugItemBrowserWindow extends Window {
 	}
 
 	private void applyFilter(boolean keepFocus) {
-		if (selectedMenu == null) return;
+		if (selectedMenu == null)
+			return;
 
 		String normalizedQuery = normalizeQuery(searchInput.getText());
 		visibleSources.clear();
@@ -441,7 +456,8 @@ public class DebugItemBrowserWindow extends Window {
 		int visibleCount = 0;
 		for (BrowserItemSource source : visibleSources) {
 			BrowserItemSlot slot = slotsBySourceId.get(source.sourceId());
-			if (slot == null) continue;
+			if (slot == null)
+				continue;
 			slot.visible = true;
 			slot.active = true;
 			int col = visibleCount % gridColumns;
@@ -471,7 +487,8 @@ public class DebugItemBrowserWindow extends Window {
 	}
 
 	private void onEntrySelected(BrowserItemSlot slot) {
-		if (slot == null) return;
+		if (slot == null)
+			return;
 		if (selectedSlot != null && selectedSlot != slot) {
 			selectedSlot.setSelected(false);
 		}
@@ -482,7 +499,8 @@ public class DebugItemBrowserWindow extends Window {
 
 	static List<Class<? extends Item>> discoverItemClasses(PackageTrie trie) {
 		ArrayList<Class<? extends Item>> classes = new ArrayList<>();
-		if (trie == null) return classes;
+		if (trie == null)
+			return classes;
 
 		LinkedHashSet<Class<? extends Item>> unique = new LinkedHashSet<>();
 		for (Class<?> cls : trie.getAllClasses()) {
@@ -506,10 +524,12 @@ public class DebugItemBrowserWindow extends Window {
 
 	static List<BrowserItemSource> buildVanillaSourcesFromClasses(Collection<Class<? extends Item>> itemClasses) {
 		ArrayList<BrowserItemSource> sources = new ArrayList<>();
-		if (itemClasses == null) return sources;
+		if (itemClasses == null)
+			return sources;
 		for (Class<? extends Item> itemClass : itemClasses) {
 			Generator.Category category = categoryForClass(itemClass);
-			if (category == null) continue;
+			if (category == null)
+				continue;
 			VanillaItemSource source = new VanillaItemSource(itemClass, category);
 			if (source.previewItem() != null) {
 				sources.add(source);
@@ -520,7 +540,8 @@ public class DebugItemBrowserWindow extends Window {
 
 	static List<BrowserItemSource> filterSources(Collection<? extends BrowserItemSource> sources, String query) {
 		ArrayList<BrowserItemSource> filtered = new ArrayList<>();
-		if (sources == null) return filtered;
+		if (sources == null)
+			return filtered;
 		String normalized = normalizeQuery(query);
 		for (BrowserItemSource source : sources) {
 			if (matchesQuery(source, normalized)) {
@@ -531,8 +552,10 @@ public class DebugItemBrowserWindow extends Window {
 	}
 
 	static int rowsForItemCount(int itemCount, int columns) {
-		if (itemCount <= 0) return 0;
-		if (columns <= 0) return itemCount;
+		if (itemCount <= 0)
+			return 0;
+		if (columns <= 0)
+			return itemCount;
 		return (itemCount + columns - 1) / columns;
 	}
 
@@ -544,7 +567,8 @@ public class DebugItemBrowserWindow extends Window {
 			int topPadding,
 			int bottomPadding) {
 		int rows = rowsForItemCount(itemCount, columns);
-		if (rows == 0) return topPadding + bottomPadding;
+		if (rows == 0)
+			return topPadding + bottomPadding;
 		return topPadding + bottomPadding + rows * slotSize + Math.max(0, rows - 1) * slotGap;
 	}
 
@@ -556,16 +580,21 @@ public class DebugItemBrowserWindow extends Window {
 			int topPadding,
 			int bottomPadding,
 			float viewportHeight) {
-		return contentHeightForItemCount(itemCount, columns, slotSize, slotGap, topPadding, bottomPadding) > viewportHeight;
+		return contentHeightForItemCount(itemCount, columns, slotSize, slotGap, topPadding,
+				bottomPadding) > viewportHeight;
 	}
 
 	static Generator.Category categoryForClass(Class<? extends Item> itemClass) {
-		if (itemClass == null) return null;
+		if (itemClass == null)
+			return null;
 		for (Generator.Category category : CATEGORY_ORDER) {
-			if (category.superClass != null && category.superClass.isAssignableFrom(itemClass)) return category;
-			if (category.classes == null) continue;
+			if (category.superClass != null && category.superClass.isAssignableFrom(itemClass))
+				return category;
+			if (category.classes == null)
+				continue;
 			for (Class<?> cls : category.classes)
-				if (cls != null && cls.isAssignableFrom(itemClass)) return category;
+				if (cls != null && cls.isAssignableFrom(itemClass))
+					return category;
 		}
 		return null;
 	}
@@ -581,9 +610,11 @@ public class DebugItemBrowserWindow extends Window {
 	}
 
 	static String normalizeMenuSelection(String raw) {
-		if (raw == null) return null;
+		if (raw == null)
+			return null;
 		String normalized = raw.trim();
-		if (normalized.isEmpty()) return null;
+		if (normalized.isEmpty())
+			return null;
 		if (normalized.regionMatches(true, 0, "mod:", 0, 4)) {
 			return modMenuKey(normalized.substring(4));
 		}
@@ -604,22 +635,43 @@ public class DebugItemBrowserWindow extends Window {
 		return Character.toUpperCase(value.charAt(0)) + value.substring(1);
 	}
 
-	private static Icons iconForCategory(Generator.Category category) {
-		if (category == Generator.Category.SEED) return Icons.SEED_POUCH;
-		if (category == Generator.Category.SCROLL) return Icons.SCROLL_HOLDER;
-		if (category == Generator.Category.POTION) return Icons.POTION_BANDOLIER;
-		if (category == Generator.Category.WAND
-				|| category == Generator.Category.MISSILE
-				|| category == Generator.Category.WEAPON) return Icons.WAND_HOLSTER;
-		return Icons.BACKPACK;
+	private static Image iconForCategory(Generator.Category category) {
+		if (category == Generator.Category.SEED)
+			return Icons.get(Icons.SEED_POUCH);
+		if (category == Generator.Category.SCROLL)
+			return Icons.get(Icons.SCROLL_HOLDER);
+		if (category == Generator.Category.POTION)
+			return Icons.get(Icons.POTION_BANDOLIER);
+		if (category == Generator.Category.WAND)
+			return Icons.get(Icons.WAND_HOLSTER);
+		if (category == Generator.Category.MISSILE)
+			return new ItemSprite(ItemSpriteSheet.MISSILE_HOLDER);
+		if (category == Generator.Category.TRINKET)
+			return new ItemSprite(ItemSpriteSheet.TRINKET_HOLDER);
+		if (category == Generator.Category.WEAPON)
+			return new ItemSprite(ItemSpriteSheet.WEAPON_HOLDER);
+		if (category == Generator.Category.ARMOR)
+			return new ItemSprite(ItemSpriteSheet.ARMOR_HOLDER);
+		if (category == Generator.Category.RING)
+			return new ItemSprite(ItemSpriteSheet.RING_HOLDER);
+		if (category == Generator.Category.ARTIFACT)
+			return new ItemSprite(ItemSpriteSheet.ARTIFACT_HOLDER);
+		if (category == Generator.Category.FOOD)
+			return new ItemSprite(ItemSpriteSheet.FOOD_HOLDER);
+		if (category == Generator.Category.STONE)
+			return new ItemSprite(ItemSpriteSheet.STONE_HOLDER);
+		return Icons.get(Icons.BACKPACK);
 	}
 
 	private static BrowserItemSource createModSource(String modId, ModItemDef def) {
-		if (def == null) return null;
+		if (def == null)
+			return null;
 		String key = modMenuKey(modId);
-		if (key == null) return null;
+		if (key == null)
+			return null;
 		Item preview = safeModPreview(def);
-		if (preview == null) return null;
+		if (preview == null)
+			return null;
 		return new ModBrowserItemSource(def, key, preview);
 	}
 
@@ -628,8 +680,10 @@ public class DebugItemBrowserWindow extends Window {
 	}
 
 	private static boolean matchesQuery(BrowserItemSource source, String normalizedQuery) {
-		if (source == null) return false;
-		if (normalizedQuery == null || normalizedQuery.isEmpty()) return true;
+		if (source == null)
+			return false;
+		if (normalizedQuery == null || normalizedQuery.isEmpty())
+			return true;
 		String searchText = source.displayName().toLowerCase(Locale.ROOT);
 		return searchText.contains(normalizedQuery);
 	}
@@ -667,7 +721,8 @@ public class DebugItemBrowserWindow extends Window {
 	}
 
 	private static Item safeIdentify(Item item) {
-		if (item == null) return null;
+		if (item == null)
+			return null;
 		try {
 			item.identify();
 			return item;
@@ -677,7 +732,8 @@ public class DebugItemBrowserWindow extends Window {
 	}
 
 	private static Item safeVanillaPreview(Class<? extends Item> itemClass) {
-		if (itemClass == null) return null;
+		if (itemClass == null)
+			return null;
 		try {
 			return safeIdentify(Reflection.newInstance(itemClass));
 		} catch (Exception ignored) {
@@ -686,7 +742,8 @@ public class DebugItemBrowserWindow extends Window {
 	}
 
 	private static Item safeModPreview(ModItemDef def) {
-		if (def == null) return null;
+		if (def == null)
+			return null;
 		try {
 			return safeIdentify(ModManager.createItemPreview(def));
 		} catch (Exception ignored) {
@@ -697,10 +754,12 @@ public class DebugItemBrowserWindow extends Window {
 	private static Item initialPreviewFor(BrowserItemSource source) {
 		if (source instanceof PreviewBackedSource) {
 			Item preview = ((PreviewBackedSource) source).previewItem();
-			if (preview != null) return preview;
+			if (preview != null)
+				return preview;
 		}
 		Item fallback = source == null ? null : source.createInstance();
-		if (fallback != null) return fallback;
+		if (fallback != null)
+			return fallback;
 		Item safeFallback = new Gold();
 		safeFallback.identify();
 		return safeFallback;
@@ -709,10 +768,10 @@ public class DebugItemBrowserWindow extends Window {
 	private static final class MenuDefinition {
 		private final String key;
 		private final String label;
-		private final Icons icon;
+		private final Image icon;
 		private final ArrayList<BrowserItemSource> sources = new ArrayList<>();
 
-		private MenuDefinition(String key, String label, Icons icon) {
+		private MenuDefinition(String key, String label, Image icon) {
 			this.key = key;
 			this.label = label;
 			this.icon = icon;
@@ -850,7 +909,7 @@ public class DebugItemBrowserWindow extends Window {
 		private MenuButton(MenuDefinition menu) {
 			super();
 			this.menu = menu;
-			icon(Icons.get(menu.icon));
+			icon(menu.icon);
 		}
 
 		@Override

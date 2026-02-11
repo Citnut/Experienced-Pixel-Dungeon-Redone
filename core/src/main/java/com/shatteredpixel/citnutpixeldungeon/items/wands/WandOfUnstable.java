@@ -34,6 +34,8 @@ import com.watabou.utils.Reflection;
 
 public class WandOfUnstable extends Wand {
 
+    private static final String GLITCH_CHARS = "!@#$%^&*+-=?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
     {
         image = ItemSpriteSheet.WAND_UNSTABLE;
     }
@@ -91,12 +93,16 @@ public class WandOfUnstable extends Wand {
 
     @Override
     public String name() {
-        String glitchy = "¢ÄãćS±«»ùăæǅƆǑʥʄɤȨζϻϡΰѾӫӸףעᵿᶗᵺᶆ";
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < 8; i++){
-            builder.append(glitchy.charAt(Random.Int(glitchy.length())));
+        return super.name() + randomGlitchText(8);
+    }
+
+    public static String randomGlitchText(int length) {
+        int count = Math.max(0, length);
+        StringBuilder builder = new StringBuilder(count);
+        for (int i = 0; i < count; i++) {
+            builder.append(GLITCH_CHARS.charAt(Random.Int(GLITCH_CHARS.length())));
         }
-        return super.name() + builder.toString();
+        return builder.toString();
     }
 
 
