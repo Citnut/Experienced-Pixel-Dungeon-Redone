@@ -825,6 +825,7 @@ public class WndSettings extends WndTabbed {
 		CheckBox chkUpdates;
 		CheckBox chkBetas;
 		CheckBox chkWifi;
+		RedButton btnMods;
 
 		@Override
 		protected void createChildren() {
@@ -883,6 +884,15 @@ public class WndSettings extends WndTabbed {
 				chkWifi.checked(SPDSettings.WiFi());
 				add(chkWifi);
 			}
+
+			btnMods = new RedButton(Messages.get(this, "mods")) {
+				@Override
+				protected void onClick() {
+					super.onClick();
+					ShatteredPixelDungeon.scene().add(new WndMods());
+				}
+			};
+			add(btnMods);
 		}
 
 		@Override
@@ -913,6 +923,11 @@ public class WndSettings extends WndTabbed {
 			if (chkWifi != null){
 				chkWifi.setRect(0, pos + GAP, width, BTN_HEIGHT);
 				pos = chkWifi.bottom();
+			}
+
+			if (btnMods != null){
+				btnMods.setRect(0, pos + GAP, width, BTN_HEIGHT);
+				pos = btnMods.bottom();
 			}
 
 			height = pos;

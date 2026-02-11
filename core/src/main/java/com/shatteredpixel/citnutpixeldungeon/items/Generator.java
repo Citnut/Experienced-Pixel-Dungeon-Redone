@@ -164,6 +164,7 @@ import com.shatteredpixel.citnutpixeldungeon.plants.Starflower;
 import com.shatteredpixel.citnutpixeldungeon.plants.Stormvine;
 import com.shatteredpixel.citnutpixeldungeon.plants.Sungrass;
 import com.shatteredpixel.citnutpixeldungeon.plants.Swiftthistle;
+import com.shatteredpixel.citnutpixeldungeon.mod.ModManager;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.GameMath;
 import com.watabou.utils.Random;
@@ -659,6 +660,9 @@ public class Generator {
 	}
 
 	public static Item random( Category cat ) {
+		Item modItem = ModManager.rollItem(cat, baseWeightFor(cat, false));
+		if (modItem != null) return modItem;
+
 		if (Random.Int(135) == 0 &&
 			cat != Category.WAND &&
 			cat != Category.WEAPON &&
@@ -715,6 +719,9 @@ public class Generator {
 	//overrides any deck systems and always uses default probs
 	// except for artifacts, which must always use a deck
 	public static Item randomUsingDefaults( Category cat ){
+		Item modItem = ModManager.rollItem(cat, baseWeightFor(cat, true));
+		if (modItem != null) return modItem;
+
 		if (cat == Category.WEAPON){
 			return randomWeapon(true);
 		} else if (cat == Category.MISSILE){
@@ -727,6 +734,30 @@ public class Generator {
 		} else {
 			return ((Item) Reflection.newInstance(cat.classes[Random.chances(cat.defaultProbs)])).random();
 		}
+	}
+
+	private static float baseWeightFor(Category cat, boolean useDefaults){
+		float[] probs = null;
+		if (cat.defaultProbs != null){
+			if (useDefaults){
+				probs = cat.defaultProbsTotal != null ? cat.defaultProbsTotal : cat.defaultProbs;
+			} else {
+				probs = cat.probs;
+			}
+		}
+
+		if (probs != null){
+			float total = 0f;
+			for (float p : probs) total += p;
+			return total;
+		}
+
+		if (cat.classes != null && cat.classes.length > 0){
+			return cat.classes.length;
+		}
+
+		//fallback to a minimal base weight to avoid mod items dominating by default
+		return 1f;
 	}
 	
 	public static Item random( Class<? extends Item> cl ) {

@@ -199,6 +199,8 @@ public enum Document {
 					return new ItemSprite( ItemSpriteSheet.TRINKET_CATA );
 				case "Dieing":
 					return new ItemSprite( ItemSpriteSheet.TOMB );
+				case Document.GUIDE_MODS:
+					return Icons.get(Icons.DATA);
 				case Document.GUIDE_SEARCHING:
 					return Icons.get(Icons.MAGNIFY);
 				case "Strength":
@@ -249,6 +251,7 @@ public enum Document {
 	public static final String GUIDE_FOOD           = "Food";
 	public static final String GUIDE_ALCHEMY        = "Alchemy";
 	public static final String GUIDE_DIEING         = "Dieing";
+	public static final String GUIDE_MODS           = "Modding";
 
 	public static final String GUIDE_SEARCHING      = "Searching";
 
@@ -265,6 +268,7 @@ public enum Document {
 		ADVENTURERS_GUIDE.pagesStates.put(GUIDE_FOOD,           debug ? READ : NOT_FOUND);
 		ADVENTURERS_GUIDE.pagesStates.put(GUIDE_ALCHEMY,        debug ? READ : NOT_FOUND);
 		ADVENTURERS_GUIDE.pagesStates.put(GUIDE_DIEING,         debug ? READ : NOT_FOUND);
+		ADVENTURERS_GUIDE.pagesStates.put(GUIDE_MODS,           debug ? READ : NOT_FOUND);
 		//given in sewers
 		ADVENTURERS_GUIDE.pagesStates.put(GUIDE_SEARCHING,      debug ? READ : NOT_FOUND);
 		ADVENTURERS_GUIDE.pagesStates.put("Strength",           debug ? READ : NOT_FOUND);

@@ -133,6 +133,7 @@ if (Messages.lang() != Languages.ENGLISH){
 				ExpPDChanges.addAllChanges(changeInfos);
 				break;
 			case 1:
+				v3_X_Changes.addAllChanges(changeInfos);
 				v2_X_Changes.addAllChanges(changeInfos);
 				v1_X_Changes.addAllChanges(changeInfos);
 				v0_9_X_Changes.addAllChanges(changeInfos);
@@ -143,6 +144,9 @@ if (Messages.lang() != Languages.ENGLISH){
 				v0_3_X_Changes.addAllChanges(changeInfos);
 				v0_2_X_Changes.addAllChanges(changeInfos);
 				v0_1_X_Changes.addAllChanges(changeInfos);
+				break;
+			case 2:
+				CitnutPDChanges.addAllChanges(changeInfos);
 				break;
 		}
 
@@ -198,6 +202,20 @@ if (Messages.lang() != Languages.ENGLISH){
 				panel.innerHeight() + 2);
 		list.scrollTo(0, 0);
 
+		RedButton btnCitnut = new RedButton("CitnutPD"){
+			@Override
+			protected void onClick() {
+				super.onClick();
+				if (changesSelected != 2) {
+					changesSelected = 2;
+					ShatteredPixelDungeon.seamlessResetScene();
+				}
+			}
+		};
+		if (changesSelected == 2) btnCitnut.textColor(Window.TITLE_COLOR);
+		btnCitnut.setRect(list.left()-4f, list.bottom()+5, 62, 14);
+		add(btnCitnut);
+
         RedButton btnEXP = new RedButton("ExpPD"){
             @Override
             protected void onClick() {
@@ -209,10 +227,10 @@ if (Messages.lang() != Languages.ENGLISH){
             }
         };
         if (changesSelected == 0) btnEXP.textColor(Window.TITLE_COLOR);
-        btnEXP.setRect(list.left()-4f, list.bottom()+5, 70, 14);
+        btnEXP.setRect(btnCitnut.right() + 1, btnCitnut.top(), 40, 14);
         add(btnEXP);
 
-		RedButton btn0_8 = new RedButton("ShPD"){
+		RedButton btnShPD = new RedButton("ShPD"){
 			@Override
 			protected void onClick() {
 				super.onClick();
@@ -222,9 +240,9 @@ if (Messages.lang() != Languages.ENGLISH){
 				}
 			}
 		};
-		if (changesSelected == 1) btn0_8.textColor(Window.TITLE_COLOR);
-		btn0_8.setRect(btnEXP.right() + 1, btnEXP.top(), 70, 14);
-		add(btn0_8);
+		if (changesSelected == 1) btnShPD.textColor(Window.TITLE_COLOR);
+		btnShPD.setRect(btnEXP.right() + 1, btnEXP.top(), 40, 14);
+		add(btnShPD);
 
 		Archs archs = new Archs();
 		archs.setSize( Camera.main.width, Camera.main.height );

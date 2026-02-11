@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 android {
     namespace 'com.shatteredpixel.citnutpixeldungeon.android'
     compileSdk appAndroidCompileSDK
+    // Compile Android sources with Java 17 bytecode level.
     compileOptions.sourceCompatibility = compileOptions.targetCompatibility = appJavaCompatibility
 
     sourceSets.main.assets.srcDirs = [new File(project(':core').projectDir, "/src/main/assets")]
@@ -26,10 +27,6 @@ android {
         debug {
             applicationIdSuffix ".indev"
             versionNameSuffix '-INDEV'
-            dependencies {
-                debugImplementation project(':services:updates:debugUpdates')
-                debugImplementation project(':services:news:ingameNews')
-            }
         }
         release {
 
@@ -40,11 +37,6 @@ android {
             shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
-            dependencies {
-                releaseImplementation project(':services:updates:githubUpdates')
-                releaseImplementation project(':services:news:ingameNews')
-            }
         }
     }
 
@@ -59,6 +51,10 @@ configurations { natives }
 
 dependencies {
     implementation project(':core')
+    debugImplementation project(':services:updates:debugUpdates')
+    debugImplementation project(':services:news:ingameNews')
+    releaseImplementation project(':services:updates:githubUpdates')
+    releaseImplementation project(':services:news:ingameNews')
 
     // We are using the natives from 1.11.0 to maintain compatibility with Android 4.0-4.3 for now
     // The 1.12.0+ natives are compiled with a version of the NDK which drops 4.3- support

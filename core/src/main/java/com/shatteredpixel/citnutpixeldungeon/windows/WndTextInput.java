@@ -95,12 +95,23 @@ public class WndTextInput extends Window {
 			public void onChanged() {
 				super.onChanged();
 				if (btnCopy != null) btnCopy.enable(!getText().isEmpty());
+				WndTextInput.this.onTextChanged(getText());
 			}
 
 			@Override
 			public void onClipBoardUpdate() {
 				super.onClipBoardUpdate();
 				btnPaste.enable(Gdx.app.getClipboard().hasContents());
+			}
+
+			@Override
+			public boolean onTabPressed() {
+				return WndTextInput.this.onTabPressed(getText());
+			}
+
+			@Override
+			public boolean onRightPressed() {
+				return WndTextInput.this.onRightPressed(getText());
 			}
 		};
 		if (initialValue != null) textBox.setText(initialValue);
@@ -227,6 +238,12 @@ public class WndTextInput extends Window {
 	}
 
 	public void onSelect(boolean positive, String text){ }
+
+	protected void onTextChanged(String text) { }
+
+	protected boolean onTabPressed(String text) { return false; }
+
+	protected boolean onRightPressed(String text) { return false; }
 
 	@Override
 	public void onBackPressed() {

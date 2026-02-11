@@ -1,4 +1,12 @@
 apply plugin: 'java-library'
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-sourceCompatibility = targetCompatibility = appJavaCompatibility
+
+java {
+    sourceCompatibility = appJavaCompatibility
+    targetCompatibility = appJavaCompatibility
+    toolchain {
+        // Align with JDK 17 toolchain.
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}

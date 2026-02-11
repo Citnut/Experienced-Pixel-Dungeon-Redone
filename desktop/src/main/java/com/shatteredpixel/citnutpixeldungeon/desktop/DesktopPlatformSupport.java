@@ -35,6 +35,7 @@ import com.watabou.input.ControllerHandler;
 import com.watabou.noosa.Game;
 import com.watabou.utils.PlatformSupport;
 import com.watabou.utils.Point;
+import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -174,6 +175,25 @@ public class DesktopPlatformSupport extends PlatformSupport {
 			return regularsplitterMultiline.split(text);
 		} else {
 			return regularsplitter.split(text);
+		}
+	}
+
+	@Override
+	public boolean hasFilePicker() {
+		return true;
+	}
+
+	@Override
+	public void selectFile(String[] extensions, FileChooserCallback callback) {
+		String path = TinyFileDialogs.tinyfd_openFileDialog(
+				"Select Mod Zip",
+				"",
+				null,
+				"Mod Zip",
+				false);
+
+		if (callback != null) {
+			callback.onResult(path);
 		}
 	}
 }

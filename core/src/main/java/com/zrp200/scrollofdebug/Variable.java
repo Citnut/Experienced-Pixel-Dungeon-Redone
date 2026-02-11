@@ -12,7 +12,9 @@ import com.watabou.noosa.Game;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 abstract public class Variable<T> {
     @SuppressWarnings("rawtypes")
@@ -87,6 +89,18 @@ abstract public class Variable<T> {
             if(v != null) return v.getTarget();
         }
         return null;
+    }
+
+    public static List<String> activeNames() {
+        ArrayList<String> names = new ArrayList<>();
+        for (String key : assigned.keySet()) {
+            Variable<?> variable = assigned.get(key);
+            if (variable != null && variable.isActive()) {
+                names.add(key);
+            }
+        }
+        Collections.sort(names, String.CASE_INSENSITIVE_ORDER);
+        return names;
     }
 
     // note this can still have situational weird behavior, but this should mostly prevent unintentional variable usage.

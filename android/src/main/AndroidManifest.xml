@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.shatteredpixel.citnutpixeldungeon.android"
 	xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto"
 	android:targetSandboxVersion="2"
@@ -35,9 +34,9 @@
 		android:resizeableActivity="true"
 		android:allowBackup="true"
 		android:fullBackupOnly="true"
-		android:backupAgent=".AndroidBackupHandler">
+		android:backupAgent="com.shatteredpixel.citnutpixeldungeon.android.AndroidBackupHandler">
 		<activity
-			android:name=".AndroidLauncher"
+			android:name="com.shatteredpixel.citnutpixeldungeon.android.AndroidLauncher"
 			android:screenOrientation="nosensor"
 			android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
 			android:exported="true">
@@ -47,7 +46,7 @@
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".AndroidMissingNativesHandler">
+			android:name="com.shatteredpixel.citnutpixeldungeon.android.AndroidMissingNativesHandler">
 		</activity>
 	</application>
 

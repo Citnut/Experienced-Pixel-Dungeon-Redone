@@ -8,10 +8,9 @@ buildscript {
         }
     }
     dependencies {
-        //gradle version packaged with AGP 8.5 causes crashes on Android 4.4-
-        //this won't be needed once the bundled version is 8.7.2+
-        classpath 'com.android.tools:r8:8.7.4-dev'
-        classpath 'com.android.tools.build:gradle:8.5.1'
+        // Keep R8 aligned with AGP to avoid D8 API mismatches.
+        classpath 'com.android.tools:r8:8.13.19'
+        classpath 'com.android.tools.build:gradle:8.13.2'
     }
 }
 
@@ -21,17 +20,18 @@ allprojects {
         appName = 'Citnut PD'
         appPackageName = 'com.citnut.citnutpixeldungeon'
 
-        appVersionCode = 666
-        appVersionName = 'ExpPD-2.19.0'
+        appVersionCode = 696
+        appVersionName = 'CitnutExpPD-26.0.0'
 
-        appJavaCompatibility = JavaVersion.VERSION_1_8
+        // Project-wide Java version (upgrade to JDK 17).
+        appJavaCompatibility = JavaVersion.VERSION_17
 
-        appAndroidCompileSDK = 33
+        appAndroidCompileSDK = 36
         appAndroidMinSDK = 15
-        appAndroidTargetSDK = 34
+        appAndroidTargetSDK = 36
 
         gdxVersion = '1.12.1'
-        gdxControllersVersion = '2.2.4-SNAPSHOT'
+        gdxControllersVersion = '2.2.3'
         robovmVersion = '2.3.21'
     }
     version = appVersionName

@@ -37,6 +37,10 @@ import java.util.HashMap;
 
 public abstract class PlatformSupport {
 
+	public interface FileChooserCallback {
+		void onResult(String path);
+	}
+
 	public PackageTrie findClasses(String pckgname) throws ClassNotFoundException {
 		return PackageTrie.getClassesForPackage(pckgname);
 	}
@@ -67,6 +71,16 @@ public abstract class PlatformSupport {
 
 	public void setOnscreenKeyboardVisible(boolean value){
 		Gdx.input.setOnscreenKeyboardVisible(value);
+	}
+
+	public boolean hasFilePicker() {
+		return false;
+	}
+
+	public void selectFile(String[] extensions, FileChooserCallback callback) {
+		if (callback != null) {
+			callback.onResult(null);
+		}
 	}
 
 	//TODO should consider spinning this into its own class, rather than platform support getting ever bigger

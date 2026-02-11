@@ -39,7 +39,6 @@ import java.util.ArrayList;
 public class v2_X_Changes {
 
 	public static void addAllChanges( ArrayList<ChangeInfo> changeInfos ){
-		add_Coming_Soon(changeInfos);
 		add_v2_5_Changes(changeInfos);
 		add_v2_4_Changes(changeInfos);
 		add_v2_3_Changes(changeInfos);

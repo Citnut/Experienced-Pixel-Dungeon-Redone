@@ -1,0 +1,20 @@
+{
+  "items": [
+    {
+      "id": "zip-example:glow_berry",
+      "name": "Glow Berry",
+      "desc": "Một loại quả phát sáng nhẹ.",
+      "category": "FOOD",
+      "sprite": 31,
+      "stackable": true,
+      "value": 10,
+      "spawn_weight": 1.0,
+      "use_time": 1.0,
+      "use": {
+        "type": "SATIETY",
+        "amount": 30,
+        "message": "Bạn cảm thấy no hơn."
+      }
+    }
+  ]
+}

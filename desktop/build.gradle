@@ -3,26 +3,47 @@ plugins {
 }
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-sourceCompatibility = targetCompatibility = appJavaCompatibility
+
+java {
+    sourceCompatibility = appJavaCompatibility
+    targetCompatibility = appJavaCompatibility
+    toolchain {
+        // Use JDK 17 for desktop compilation.
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 
 ext.appMainClass = "com.shatteredpixel.citnutpixeldungeon.desktop.DesktopLauncher"
-processResources {
-    from new File(project(':core').projectDir, "/src/main/assets")
-    from new File(project(':desktop').projectDir,"/src/main/assets")
+sourceSets {
+    main {
+        resources {
+            srcDirs += [
+                    new File(project(':core').projectDir, "/src/main/assets"),
+                    new File(project(':desktop').projectDir, "/src/main/assets")
+            ]
+        }
+    }
 }
 
 def osName = System.getProperty('os.name').toLowerCase(Locale.ROOT)
+def gcJvmArgs = ['-XX:+UseG1GC',
+                 '-XX:MaxGCPauseMillis=50',
+                 '-XX:+ParallelRefProcEnabled']
+def gcJavaOptions = ['--java-options', '-XX:+UseG1GC',
+                     '--java-options', '-XX:MaxGCPauseMillis=50',
+                     '--java-options', '-XX:+ParallelRefProcEnabled']
 
 task debug(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     ignoreExitValue = true
 
-    main = appMainClass
+    mainClass = appMainClass
     systemProperty 'Specification-Title', appName
     systemProperty 'Implementation-Title', appPackageName
     systemProperty 'Specification-Version', appVersionName + "-INDEV"
     systemProperty 'Implementation-Version', appVersionCode
 
+    jvmArgs gcJvmArgs
     if (osName.contains('mac')) {
         jvmArgs '-XstartOnFirstThread'
     }
@@ -68,33 +89,36 @@ runtime {
 
     if (osName.contains('windows')) {
         targetPlatform("win") {
-            jdkHome = jdkDownload("https://github.com/AdoptOpenJDK/openjdk16-binaries/releases/download/jdk-16.0.1%2B9/OpenJDK16U-jdk_x64_windows_hotspot_16.0.1_9.zip")
-            javaHome = file("./build/jdks/win/jdk-16.0.1+9").getAbsolutePath()
+            // JDK 17 for jpackage runtime image.
+            jdkHome = jdkDownload("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.10%2B7/OpenJDK17U-jdk_x64_windows_hotspot_17.0.10_7.zip")
+            javaHome = file("./build/jdks/win/jdk-17.0.10+7").getAbsolutePath()
             jpackage {
-                jpackageHome = file("./build/jdks/win/jdk-16.0.1+9")
-                imageOptions = ["--icon", file("./src/main/assets/icons/windows.ico"),
-                                "--java-options", "-XX:+IgnoreUnrecognizedVMOptions"]
+                jpackageHome = file("./build/jdks/win/jdk-17.0.10+7")
+                imageOptions = ["--icon", file("./src/main/assets/icons/windows.ico")] +
+                                gcJavaOptions + ["--java-options", "-XX:+IgnoreUnrecognizedVMOptions"]
             }
         }
     } else if (osName.contains('linux')) {
         targetPlatform("linux") {
-            jdkHome = jdkDownload("https://github.com/AdoptOpenJDK/openjdk16-binaries/releases/download/jdk-16.0.1%2B9/OpenJDK16U-jdk_x64_linux_hotspot_16.0.1_9.tar.gz")
-            javaHome = file("./build/jdks/linux/jdk-16.0.1+9").getAbsolutePath()
+            // JDK 17 for jpackage runtime image.
+            jdkHome = jdkDownload("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.10%2B7/OpenJDK17U-jdk_x64_linux_hotspot_17.0.10_7.tar.gz")
+            javaHome = file("./build/jdks/linux/jdk-17.0.10+7").getAbsolutePath()
             jpackage {
-                jpackageHome = file("./build/jdks/linux/jdk-16.0.1+9")
-                imageOptions = ["--icon", file("./src/main/assets/icons/icon_256.png"),
-                                "--java-options", "-XX:+IgnoreUnrecognizedVMOptions"]
+                jpackageHome = file("./build/jdks/linux/jdk-17.0.10+7")
+                imageOptions = ["--icon", file("./src/main/assets/icons/icon_256.png")] +
+                                gcJavaOptions + ["--java-options", "-XX:+IgnoreUnrecognizedVMOptions"]
             }
         }
     } else if (osName.contains('mac')) {
         targetPlatform("mac") {
-            jdkHome = jdkDownload("https://github.com/AdoptOpenJDK/openjdk16-binaries/releases/download/jdk-16.0.1%2B9/OpenJDK16U-jdk_x64_mac_hotspot_16.0.1_9.tar.gz")
-            javaHome = file("./build/jdks/mac/jdk-16.0.1+9/Contents/Home/").getAbsolutePath()
+            // JDK 17 for jpackage runtime image.
+            jdkHome = jdkDownload("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.10%2B7/OpenJDK17U-jdk_x64_mac_hotspot_17.0.10_7.tar.gz")
+            javaHome = file("./build/jdks/mac/jdk-17.0.10+7/Contents/Home/").getAbsolutePath()
             jpackage {
-                jpackageHome = file("./build/jdks/mac/jdk-16.0.1+9/Contents/Home/")
+                jpackageHome = file("./build/jdks/mac/jdk-17.0.10+7/Contents/Home/")
                 imageOptions = ["--icon", file("./src/main/assets/icons/mac.icns"),
-                                "--java-options", "-XstartOnFirstThread",
-                                "--java-options", "-XX:+IgnoreUnrecognizedVMOptions",
+                                "--java-options", "-XstartOnFirstThread"] +
+                                gcJavaOptions + ["--java-options", "-XX:+IgnoreUnrecognizedVMOptions",
                                 //append .apple because com.shatteredpixel.shatteredpixeldungeon was taken =(
                                 "--mac-package-identifier", appPackageName + ".apple",
                                 "--mac-package-name", "ShattererdPD"]

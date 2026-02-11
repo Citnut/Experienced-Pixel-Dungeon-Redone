@@ -1,0 +1,40 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "DesktopLauncher",
+            "request": "launch",
+            "mainClass": "com.shatteredpixel.citnutpixeldungeon.desktop.DesktopLauncher",
+            "projectName": "desktop",
+            "cwd": "${workspaceFolder}",
+            "vmArgs": "-DSpecification-Title=ExperiencedPixelDungeon -DImplementation-Title=com.shatteredpixel.citnutpixeldungeon -DSpecification-Version=1.0.0-INDEV -DImplementation-Version=0",
+            "classPaths": [
+                "$Runtime",
+                "${workspaceFolder}/core/src/main/assets",
+                "${workspaceFolder}/desktop/src/main/assets"
+            ]
+        },
+        {
+            "name": "Run C++ File",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/build/${fileBasenameNoExtension}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "preLaunchTask": "build active file",
+            "externalConsole": true,
+            "linux": {
+                "MIMode": "gdb",
+                "miDebuggerPath": "/usr/bin/gdb"
+            },
+            "osx": {
+                "MIMode": "lldb"
+            },
+            "windows": {
+                "MIMode": "gdb",
+                "miDebuggerPath": "C:\\mingw64\\bin\\gdb.exe"
+            }
+        }
+    ]
+}

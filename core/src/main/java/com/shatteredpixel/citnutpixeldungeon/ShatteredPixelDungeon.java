@@ -27,6 +27,7 @@ package com.shatteredpixel.citnutpixeldungeon;
 import com.shatteredpixel.citnutpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.citnutpixeldungeon.scenes.PixelScene;
 import com.shatteredpixel.citnutpixeldungeon.scenes.TitleScene;
+import com.shatteredpixel.citnutpixeldungeon.mod.ModManager;
 import com.watabou.noosa.Game;
 import com.watabou.noosa.audio.Music;
 import com.watabou.noosa.audio.Sample;
@@ -138,6 +139,7 @@ public class ShatteredPixelDungeon extends Game {
 
 		updateSystemUI();
 		SPDAction.loadBindings();
+		ModManager.load();
 		
 		Music.INSTANCE.enable( SPDSettings.music() );
 		Music.INSTANCE.volume( SPDSettings.musicVol()*SPDSettings.musicVol()/100f );

@@ -31,6 +31,8 @@ import com.shatteredpixel.citnutpixeldungeon.effects.Speck;
 import com.shatteredpixel.citnutpixeldungeon.items.Gold;
 import com.shatteredpixel.citnutpixeldungeon.items.Heap;
 import com.shatteredpixel.citnutpixeldungeon.items.Item;
+import com.shatteredpixel.citnutpixeldungeon.mod.ModItemDef;
+import com.shatteredpixel.citnutpixeldungeon.mod.ModSpriteItem;
 import com.shatteredpixel.citnutpixeldungeon.levels.Terrain;
 import com.shatteredpixel.citnutpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.citnutpixeldungeon.scenes.PixelScene;
@@ -202,7 +204,16 @@ public class ItemSprite extends MovieClip {
 	}
 
 	public ItemSprite view( Item item ){
-		view(item.image(), item.glowing());
+		if (item instanceof ModSpriteItem) {
+			ModItemDef def = ((ModSpriteItem) item).modDef();
+			if (def != null && def.spriteFile != null && def.spriteFile.exists()) {
+				viewExternal(def, item.glowing());
+			} else {
+				view(item.image(), item.glowing());
+			}
+		} else {
+			view(item.image(), item.glowing());
+		}
 		Emitter emitter = item.emitter();
 		if (emitter != null && parent != null) {
 			emitter.pos( this );
@@ -240,6 +251,7 @@ public class ItemSprite extends MovieClip {
 	public ItemSprite view( int image, Glowing glowing ) {
 		if (this.emitter != null) this.emitter.killAndErase();
 		emitter = null;
+		texture( Assets.Sprites.ITEMS );
 		frame( image );
 		glow( glowing );
 		return this;
@@ -252,7 +264,25 @@ public class ItemSprite extends MovieClip {
 		//adds extra raise to very short items, so they are visible
 		if (height < 8f){
 			perspectiveRaise =  (5 + 8 - height) / 16f;
+		} else {
+			perspectiveRaise = 5 / 16f;
 		}
+	}
+
+	private void viewExternal(ModItemDef def, Glowing glowing) {
+		if (this.emitter != null) this.emitter.killAndErase();
+		emitter = null;
+
+		texture(def.spriteFile);
+		if (def.spriteW > 0 && def.spriteH > 0) {
+			frame(def.spriteX, def.spriteY, def.spriteW, def.spriteH);
+		} else {
+			frame(0, 0, (int)texture.width, (int)texture.height);
+		}
+		glow(glowing);
+
+		float heightPx = height;
+		perspectiveRaise = heightPx < 8f ? (5 + 8 - heightPx) / 16f : 5 / 16f;
 	}
 	
 	public synchronized void glow( Glowing glowing ){

@@ -1,15 +1,30 @@
 apply plugin: 'java-library'
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-sourceCompatibility = targetCompatibility = appJavaCompatibility
 
 dependencies {
     api project(':SPD-classes')
     implementation project(':services')
+    testImplementation "junit:junit:4.13.2"
+    testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+    testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 }
 
 java {
+    sourceCompatibility = appJavaCompatibility
+    targetCompatibility = appJavaCompatibility
     toolchain {
+        // Ensure Gradle uses a JDK 17 toolchain for compilation/test.
         languageVersion = JavaLanguageVersion.of(17)
     }
+}
+
+sourceSets {
+    test {
+        resources.srcDirs += ['src/main/assets']
+    }
+}
+
+test {
+    useJUnit()
 }

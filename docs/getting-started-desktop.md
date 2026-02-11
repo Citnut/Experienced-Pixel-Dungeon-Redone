@@ -74,6 +74,7 @@ Shattered Pixel Dungeon uses [JPackage](https://dev.java/learn/jpackage/) and [B
 Just like with a JAR, generating a platform-specific executable requires a new run configuration. Use 'jpackageimage' instead of 'release'. This may take a bit of time, and will generate an executable file in the `/desktop/build/jpackage` folder. All the specific configurations for badass runtime and jpackage are already set up, but you can view them in the 'runtime' block in [desktop/build.gradle](./desktop/build.gradle).
 
 You will only be able to create an executable that matches the operation system you are currently using:
+
 - If you have a Windows computer, you can generate a folder with a Windows .exe file inside (zip before distributing)
 - If you have a MacOS computer, you can generate a .app file which Mac users can run or place in their applications folder
   - **Note that your .app will probably need to be [notarized](https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution) by Apple for users to be able to use it.** The [desktop/notarize.sh](./desktop/notarize.sh) file helps automate this process if you already have notarization set up.

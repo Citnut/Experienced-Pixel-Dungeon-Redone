@@ -62,12 +62,13 @@ public class DesktopLauncher {
 			SharedLibraryLoader.is64Bit = System.getProperty("os.arch").contains("64") || System.getProperty("os.arch").startsWith("armv8");
 		}
 
-		final String title;
-		if (DesktopLauncher.class.getPackage().getSpecificationTitle() == null){
-			title = System.getProperty("Specification-Title");
-		} else {
-			title = DesktopLauncher.class.getPackage().getSpecificationTitle();
-		}
+			final String title;
+			if (DesktopLauncher.class.getPackage().getSpecificationTitle() == null){
+				String specTitle = System.getProperty("Specification-Title");
+				title = (specTitle == null || specTitle.trim().isEmpty()) ? "Experienced Pixel Dungeon" : specTitle;
+			} else {
+				title = DesktopLauncher.class.getPackage().getSpecificationTitle();
+			}
 		
 		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 			@Override
@@ -119,11 +120,15 @@ public class DesktopLauncher {
 			Game.version = System.getProperty("Specification-Version");
 		}
 		
-		try {
-			Game.versionCode = Integer.parseInt(DesktopLauncher.class.getPackage().getImplementationVersion());
-		} catch (NumberFormatException e) {
-			Game.versionCode = Integer.parseInt(System.getProperty("Implementation-Version"));
-		}
+			String implVersion = DesktopLauncher.class.getPackage().getImplementationVersion();
+			if (implVersion == null) {
+				implVersion = System.getProperty("Implementation-Version");
+			}
+			try {
+				Game.versionCode = Integer.parseInt(implVersion);
+			} catch (Exception e) {
+				Game.versionCode = 0;
+			}
 
 		if (UpdateImpl.supportsUpdates()){
 			Updates.service = UpdateImpl.getUpdateService();
@@ -139,11 +144,21 @@ public class DesktopLauncher {
 		//if I were implementing this from scratch I would use the full implementation title for saves
 		// (e.g. /.shatteredpixel/shatteredpixeldungeon), but we have too much existing save
 		// date to worry about transferring at this point.
-		String vendor = DesktopLauncher.class.getPackage().getImplementationTitle();
-		if (vendor == null) {
-			vendor = System.getProperty("Implementation-Title");
-		}
-		vendor = vendor.split("\\.")[1];
+			String vendor = DesktopLauncher.class.getPackage().getImplementationTitle();
+			if (vendor == null || vendor.trim().isEmpty()) {
+				vendor = System.getProperty("Implementation-Title");
+			}
+			if (vendor == null || vendor.trim().isEmpty()) {
+				vendor = "com.shatteredpixel.citnutpixeldungeon";
+			}
+			String[] vendorParts = vendor.split("\\.");
+			if (vendorParts.length > 1 && vendorParts[1] != null && !vendorParts[1].isEmpty()) {
+				vendor = vendorParts[1];
+			} else if (vendorParts.length > 0 && vendorParts[0] != null && !vendorParts[0].isEmpty()) {
+				vendor = vendorParts[0];
+			} else {
+				vendor = "shatteredpixel";
+			}
 
 		String basePath = "";
 		Files.FileType baseFileType = null;
@@ -185,8 +200,10 @@ public class DesktopLauncher {
 		DesktopWindowListener listener = new DesktopWindowListener();
 		config.setWindowListener( listener );
 		
-		config.setWindowIcon("icons/icon_16.png", "icons/icon_32.png", "icons/icon_48.png",
-				"icons/icon_64.png", "icons/icon_128.png", "icons/icon_256.png");
+			if (DesktopLauncher.class.getClassLoader().getResource("icons/icon_16.png") != null) {
+				config.setWindowIcon("icons/icon_16.png", "icons/icon_32.png", "icons/icon_48.png",
+						"icons/icon_64.png", "icons/icon_128.png", "icons/icon_256.png");
+			}
 
 		new Lwjgl3Application(new ShatteredPixelDungeon(new DesktopPlatformSupport()), config);
 	}

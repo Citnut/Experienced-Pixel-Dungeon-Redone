@@ -25,12 +25,16 @@
 package com.shatteredpixel.citnutpixeldungeon.android;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
+import android.provider.OpenableColumns;
 import android.view.View;
 import android.view.WindowManager;
 import com.badlogic.gdx.Gdx;
@@ -41,17 +45,23 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.shatteredpixel.citnutpixeldungeon.SPDSettings;
 import com.shatteredpixel.citnutpixeldungeon.scenes.PixelScene;
 import com.watabou.noosa.Game;
+import com.watabou.utils.FileUtils;
 import com.watabou.utils.PlatformSupport;
 import com.zrp200.scrollofdebug.PackageTrie;
 import dalvik.system.DexFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Locale;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AndroidPlatformSupport extends PlatformSupport {
+
+	private static final int REQ_PICK_MOD = 42010;
+	private static FileChooserCallback pendingCallback;
 	
 	public void updateDisplaySize(){
 		if (SPDSettings.landscape() != null) {
@@ -175,6 +185,121 @@ public class AndroidPlatformSupport extends PlatformSupport {
 	@Override
 	public boolean supportsVibration() {
 		return true; //always true on Android
+	}
+
+	@Override
+	public boolean hasFilePicker() {
+		return true;
+	}
+
+	@Override
+	public void selectFile(String[] extensions, FileChooserCallback callback) {
+		pendingCallback = callback;
+		AndroidLauncher.instance.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+				intent.addCategory(Intent.CATEGORY_OPENABLE);
+				intent.setType("*/*");
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+					intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {
+							"application/zip",
+							"application/x-zip-compressed",
+							"application/octet-stream"
+					});
+				}
+				AndroidLauncher.instance.startActivityForResult(intent, REQ_PICK_MOD);
+			}
+		});
+	}
+
+	public static boolean handleFilePickerResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode != REQ_PICK_MOD) return false;
+		FileChooserCallback callback = pendingCallback;
+		pendingCallback = null;
+
+		if (callback == null) return true;
+		if (resultCode != Activity.RESULT_OK || data == null) {
+			postResult(callback, null);
+			return true;
+		}
+
+		Uri uri = data.getData();
+		if (uri == null) {
+			postResult(callback, null);
+			return true;
+		}
+
+		String name = queryDisplayName(uri);
+		if (name == null || name.trim().isEmpty()) {
+			name = "mod.zip";
+		}
+		name = sanitizeName(name);
+		if (!name.toLowerCase(Locale.ROOT).endsWith(".zip")) {
+			name = name + ".zip";
+		}
+
+		com.badlogic.gdx.files.FileHandle modsRoot = FileUtils.getFileHandle("mods");
+		if (modsRoot == null) {
+			postResult(callback, null);
+			return true;
+		}
+		if (!modsRoot.exists()) modsRoot.mkdirs();
+
+		com.badlogic.gdx.files.FileHandle dest = uniqueDest(modsRoot, name);
+
+		try (InputStream in = AndroidLauncher.instance.getContentResolver().openInputStream(uri)) {
+			if (in == null) {
+				postResult(callback, null);
+				return true;
+			}
+			dest.write(in, false);
+			postResult(callback, dest.file().getAbsolutePath());
+		} catch (Exception e) {
+			postResult(callback, null);
+		}
+		return true;
+	}
+
+	private static String queryDisplayName(Uri uri) {
+		try (android.database.Cursor cursor = AndroidLauncher.instance.getContentResolver().query(
+				uri, null, null, null, null)) {
+			if (cursor != null && cursor.moveToFirst()) {
+				int idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+				if (idx >= 0) {
+					return cursor.getString(idx);
+				}
+			}
+		} catch (Exception ignored) {
+		}
+		return null;
+	}
+
+	private static com.badlogic.gdx.files.FileHandle uniqueDest(com.badlogic.gdx.files.FileHandle dir, String name) {
+		com.badlogic.gdx.files.FileHandle dest = dir.child(name);
+		if (!dest.exists()) return dest;
+		String base = dest.nameWithoutExtension();
+		String ext = dest.extension();
+		int i = 1;
+		while (dest.exists()) {
+			String candidate = base + "-" + i + (ext.isEmpty() ? "" : "." + ext);
+			dest = dir.child(candidate);
+			i++;
+		}
+		return dest;
+	}
+
+	private static String sanitizeName(String name) {
+		return name.replaceAll("[^a-zA-Z0-9._-]", "_");
+	}
+
+	private static void postResult(FileChooserCallback callback, String path) {
+		Gdx.app.postRunnable(new Runnable() {
+			@Override
+			public void run() {
+				callback.onResult(path);
+			}
+		});
 	}
 
 	/* FONT SUPPORT */

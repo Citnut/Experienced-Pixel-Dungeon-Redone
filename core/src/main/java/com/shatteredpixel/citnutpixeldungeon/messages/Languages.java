@@ -29,6 +29,24 @@ import java.util.Locale;
 public enum Languages {
 	ENGLISH("english",      "",   Status.O_COMPLETE,   null, null),
 	CHINESE("中文",         "zh", Status.O_COMPLETE, new String[]{"Chronie_Lynn_Iwa", "Jinkeloid(zdx00793)", "endlesssolitude", "catand"}, new String[]{"931451545", "Budding", "Fatir", "Fishbone", "Hcat", "HoofBumpBlurryface", "Horr_lski", "Lery", "Lyn_0401", "Lyx0527", "Ooooscar", "RainSlide", "ShatteredFlameBlast", "SpaceAnchor", "Teller", "hmdzl001", "leo", "tempest102", "户方狸奴", "catand"}),
+	BELARUSIAN("Беларуская", "be", Status.X_UNFINISH, null, null),
+	CZECH("Čeština",        "cs", Status.X_UNFINISH, null, null),
+	GERMAN("Deutsch",       "de", Status.X_UNFINISH, null, null),
+	GREEK("Ελληνικά",       "el", Status.X_UNFINISH, null, null),
+	ESPERANTO("Esperanto",  "eo", Status.X_UNFINISH, null, null),
+	SPANISH("Español",      "es", Status.X_UNFINISH, null, null),
+	FRENCH("Français",      "fr", Status.X_UNFINISH, null, null),
+	HUNGARIAN("Magyar",     "hu", Status.X_UNFINISH, null, null),
+	INDONESIAN("Bahasa Indonesia", "in", Status.X_UNFINISH, null, null),
+	ITALIAN("Italiano",     "it", Status.X_UNFINISH, null, null),
+	JAPANESE("日本語",      "ja", Status.X_UNFINISH, null, null),
+	KOREAN("한국어",         "ko", Status.X_UNFINISH, null, null),
+	DUTCH("Nederlands",     "nl", Status.X_UNFINISH, null, null),
+	POLISH("Polski",        "pl", Status.X_UNFINISH, null, null),
+	PORTUGUESE("Português", "pt", Status.X_UNFINISH, null, null),
+	RUSSIAN("Русский",      "ru", Status.X_UNFINISH, null, null),
+	TURKISH("Türkçe",       "tr", Status.X_UNFINISH, null, null),
+	UKRAINIAN("Українська", "uk", Status.X_UNFINISH, null, null),
 	VIETNAMESE("Tiếng Việt", "vi", Status.X_UNFINISH, new String[]{"Citnut"}, null);
 	public enum Status{
 		//below 80% translated languages are not added or removed

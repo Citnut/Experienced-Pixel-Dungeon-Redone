@@ -143,6 +143,14 @@ public class AndroidLauncher extends AndroidApplication {
 	}
 
 	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (AndroidPlatformSupport.handleFilePickerResult(requestCode, resultCode, data)) {
+			return;
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+
+	@Override
 	public AndroidAudio createAudio(Context context, AndroidApplicationConfiguration config) {
 		return new AsynchronousAndroidAudio(context, config);
 	}
@@ -160,6 +168,7 @@ public class AndroidLauncher extends AndroidApplication {
 		super.onResume();
 	}
 
+	@SuppressLint("GestureBackNavigation")
 	@Override
 	public void onBackPressed() {
 		//do nothing, game should catch all back presses

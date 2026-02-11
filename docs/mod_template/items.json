@@ -1,0 +1,41 @@
+{
+  "items": [
+    {
+      "id": "example-mod:healing_leaf",
+      "name": "Healing Leaf",
+      "desc": "Hồi 10 HP ngay lập tức.",
+      "category": "POTION",
+      "item_type": "ITEM",
+      "sprite": 0,
+      "stackable": true,
+      "value": 20,
+      "spawn_weight": 1.0,
+      "use_time": 1.0,
+      "use": {
+        "type": "HEAL",
+        "amount": 10,
+        "message": "Bạn cảm thấy khỏe hơn."
+      }
+    },
+    {
+      "id": "example-mod:steel_baton",
+      "name": "Steel Baton",
+      "desc": "Gậy thép nặng.",
+      "category": "WEP_T2",
+      "item_type": "MELEE_WEAPON",
+      "sprite": 0,
+      "value": 50,
+      "spawn_weight": 0.5,
+      "tier": 2,
+      "internal_tier": 2,
+      "accuracy": 1.0,
+      "delay": 1.0,
+      "reach": 1,
+      "min_base": 4,
+      "max_base": 10,
+      "min_scale": 1,
+      "max_scale": 2,
+      "str_req": 11
+    }
+  ]
+}

@@ -24,21 +24,28 @@
 
 package com.zrp200.scrollofdebug;
 
+import static java.util.Collections.*;
+
+import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.watabou.noosa.Game;
+import com.watabou.utils.Reflection;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLDecoder;
+import java.net.*;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableMap;
-
 public class PackageTrie {
+
+    /** package of core game files (for example com.shatteredpixel.shatteredpixeldungeon) **/
+    private final String ROOT;
+    public PackageTrie(String ROOT) {this.ROOT = ROOT;}
+
+    public PackageTrie() { this("com.shatteredpixel.citnutpixeldungeon"); }  // backwards compatibility
+
     private final HashMap<String, PackageTrie> subTries = new HashMap<>();
     private final ArrayList<Class<?>> classes = new ArrayList<>();
 
@@ -73,8 +80,32 @@ public class PackageTrie {
         return null;
     }
 
-    public Class<?> findClass(String name, Class parent) {
-        return findClass(name.split("\\."), parent, 0);
+    public Class<?> findClass(String name, Class<?> parent) {
+        // first attempt to blindly match the class
+        Class<?> match = null;
+        try {
+            match = Reflection.forNameUnhandled(name);
+        } catch (ReflectionException e) {
+            if(ROOT != null && !name.startsWith(ROOT)) {
+                try {
+                    match = Reflection.forNameUnhandled(ROOT + "." + name);
+                }
+                catch (ReflectionException ignored) {/* do nothing */}
+                catch (Exception e1) {
+                    e1.addSuppressed(e);
+                    Game.reportException(e1);
+                }
+            }
+        } catch(Exception e) {Game.reportException(e);}
+        if (match != null && parent.isAssignableFrom(match)) {
+            // add it to the trie if possible
+            String pkg = match.getPackage().getName();
+            addClass(match, pkg.substring(pkg.indexOf(ROOT + ".") + 1));
+            return match;
+        }
+        // now match it from stored classes
+        match = findClass(name.split("\\."), parent, 0);
+        return match;
     }
     // known issues: duplicated classes may mask each other.
     public Class<?> findClass(String[] path, Class parent, int i) {
@@ -116,6 +147,24 @@ public class PackageTrie {
         ArrayList<Class> classes = new ArrayList(this.classes);
         for(PackageTrie tree : subTries.values()) classes.addAll(tree.getAllClasses());
         return classes;
+    }
+
+    public List<String> getAssignableClassNames(Class<?> parent) {
+        return getAssignableClassNames(parent, null);
+    }
+
+    public List<String> getAssignableClassNames(Class<?> parent, String prefix) {
+        TreeSet<String> names = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        String normalizedPrefix = prefix == null ? null : prefix.toLowerCase(Locale.ROOT);
+
+        for (Class<?> cls : getAllClasses()) {
+            if (parent != null && !parent.isAssignableFrom(cls)) continue;
+            String simpleName = cls.getSimpleName();
+            if (simpleName == null || simpleName.isEmpty()) continue;
+            if (normalizedPrefix != null && !simpleName.toLowerCase(Locale.ROOT).startsWith(normalizedPrefix)) continue;
+            names.add(simpleName);
+        }
+        return new ArrayList<>(names);
     }
 
     public boolean isEmpty() { return subTries.isEmpty() && classes.isEmpty(); }
@@ -167,7 +216,7 @@ public class PackageTrie {
 
                     if (connection instanceof JarURLConnection) {
                         checkJarFile((JarURLConnection) connection, pckgname, root);
-                    } else if ("file".equals(url.getProtocol())) {
+                    } else if (url.getProtocol().equals("file")) {
                         try {
                             checkDirectory(
                                     new File(URLDecoder.decode(url.getPath(),
@@ -206,10 +255,12 @@ public class PackageTrie {
             for (final String file : files) {
                 if (file.endsWith(".class")) {
                     try {
-                        Class cls = Class.forName(pckgname + '.'
-                                + file.substring(0, file.length() - 6));
+                        Class cls = Class.forName(
+                                pckgname + '.' + file.substring(0, file.length() - 6),
+                                false,
+                                PackageTrie.class.getClassLoader());
                         //if(canInstantiate(cls))
-                            trie.classes.add(cls);
+                        trie.classes.add(cls);
                     } catch (final NoClassDefFoundError e) {
                         // do nothing. this class hasn't been found by the
                         // loader, and we don't care.
@@ -239,7 +290,7 @@ public class PackageTrie {
             name = name.substring(0, index)
                     .replace('/', '.');
             if (name.contains(pckgname) /*&& canInstantiate(cls = Class.forName(name))*/) {
-                tree.addClass(Class.forName(name),pckgname);
+                tree.addClass(Class.forName(name, false, PackageTrie.class.getClassLoader()), pckgname);
             }
         }
     }

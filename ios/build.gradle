@@ -11,7 +11,11 @@ apply plugin: "java"
 apply plugin: "robovm"
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-sourceCompatibility = targetCompatibility = appJavaCompatibility
+
+java {
+    sourceCompatibility = appJavaCompatibility
+    targetCompatibility = appJavaCompatibility
+}
 
 task updateRoboVMProps(){
     def props = new Properties()
