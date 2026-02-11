@@ -1,21 +1,74 @@
-# Experienced Pixel Dungeon
+# Experienced Pixel Dungeon (Redone)
 
-Experienced Pixel Dungeon (Redone) is an open-source pretty grindy traditional roguelike dungeon sandbox with randomized levels, enemies and opportunities to abuse the game, and hundreds of items to collect and grind for. Its based on the [source code of Shattered Pixel Dungeon](https://github.com/00-Evan/shattered-pixel-dungeon), by [00-Evan](https://shatteredpixel.com).
+Experienced Pixel Dungeon (Redone) là một nhánh mở rộng từ [Shattered Pixel Dungeon](https://github.com/00-Evan/shattered-pixel-dungeon), tập trung vào gameplay dạng sandbox/grind, thêm hệ thống mod và nhiều thay đổi nội dung.
 
-Experienced Pixel Dungeon currently compiles for Android and Desktop platforms. You can find official releases of the game on:
+## Trạng thái dự án hiện tại
 
-[![Get it on Google Play](https://shatteredpixel.com/assets/images/badges/gplay.png)](https://play.google.com/store/apps/details?id=com.trashboxbobylev.experiencedpixeldungeon.redone)
-[![Github Releases](https://shatteredpixel.com/assets/images/badges/github.png)](https://github.com/TrashboxBobylev/Experienced-Pixel-Dungeon-Redone/releases)
+- Nền tảng đang build chính thức từ repo này: **Android** và **Desktop**.
+- Toolchain chính: **Gradle Wrapper + Java 17**.
+- Cấu hình version trong mã nguồn hiện tại:
+  - `appVersionName`: `CitnutExpPD-26.0.0`
+  - `appVersionCode`: `696`
 
-If you like this game, you can't! [Support Evan Debenham](https://www.patreon.com/ShatteredPixel), who made Shattered, instead.
+## Build nhanh
 
-The game also has *no* translation project hosted on Transifex.
+Yêu cầu: JDK 17.
 
-Note that **this repository does not accept pull requests!** The code here is provided in hopes that others may find it useful for their own projects, not to allow community contribution. Issue reports of all kinds (bug reports, feature requests, etc.) are welcome. Or not. I don't actually know.
+```bash
+# chạy desktop debug
+./gradlew desktop:debug
 
-If you'd like to work with the code, you can find the following guides in `/docs`:
-- [Compiling for Android.](docs/getting-started-android.md)
-    - **[If you plan to distribute on Google Play please read the end of this guide.](docs/getting-started-android.md#distributing-your-apk)**
-- [Compiling for desktop platforms.](docs/getting-started-desktop.md)
-- [Compiling for iOS, for people dancing mad enough to try it.](docs/getting-started-ios.md)
-- [Recommended changes for making your own version.](docs/recommended-changes.md)
+# build desktop release (JAR)
+./gradlew desktop:release
+
+# build android debug APK
+./gradlew android:assembleDebug
+
+# chạy test
+./gradlew test
+```
+
+## Cấu trúc module
+
+- `core/`: gameplay, logic game, UI, assets.
+- `SPD-classes/`: engine/util dùng chung.
+- `android/`: launcher và cấu hình Android.
+- `desktop/`: launcher và cấu hình Desktop.
+- `services/`: update/news services.
+- `docs/`: tài liệu build, modding, hướng dẫn dev.
+- `tools/`: công cụ hỗ trợ cho modding/test.
+
+## Tài liệu
+
+### Build & setup
+
+- [Android setup](docs/getting-started-android.md)
+- [Desktop setup](docs/getting-started-desktop.md)
+- [iOS setup (tham khảo, không nằm trong module build hiện tại)](docs/getting-started-ios.md)
+
+### Modding
+
+- [Modpack guide](docs/modpack.md)
+- [Mod API](docs/mod_api.md)
+- [ModKit guide](docs/modkit.md)
+- [Mod template](docs/mod_template/README.md)
+- [Mod template (zip)](docs/mod_template_zip/README.md)
+
+### Dev notes
+
+- [Hướng dẫn code](docs/huong-dan-code.md)
+- [Recommended changes](docs/recommended-changes.md)
+- [Changelog](CHANGELOG.md)
+
+### Công cụ
+
+- [ModKit tool README](tools/modkit/README.md)
+- [Item tester README](tools/item_tester/README.md)
+
+## Releases
+
+- [GitHub Releases](https://github.com/TrashboxBobylev/Experienced-Pixel-Dungeon-Redone/releases)
+
+## License
+
+Dự án phát hành theo [GPLv3](LICENSE.txt).

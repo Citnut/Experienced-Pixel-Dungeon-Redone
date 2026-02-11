@@ -1,5 +1,12 @@
 plugins {
+    id 'application'
     id 'org.beryx.runtime' version '1.12.7'
+}
+
+ext.appMainClass = "com.shatteredpixel.citnutpixeldungeon.desktop.DesktopLauncher"
+
+application {
+    mainClass = appMainClass
 }
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -13,7 +20,6 @@ java {
     }
 }
 
-ext.appMainClass = "com.shatteredpixel.citnutpixeldungeon.desktop.DesktopLauncher"
 sourceSets {
     main {
         resources {
