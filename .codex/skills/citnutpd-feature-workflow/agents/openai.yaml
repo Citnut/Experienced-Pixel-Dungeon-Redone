@@ -1,0 +1,4 @@
+interface:
+  display_name: "CitnutPD Feature Workflow"
+  short_description: "CitnutPD feature update guardrails"
+  default_prompt: "Use this workflow to implement CitnutPD features: update CitnutPDChanges.java in English, keep EN/VI messages in sync under core/src/main/assets/messages, update docs when behavior changes, and run tests/build checks then fix failures."

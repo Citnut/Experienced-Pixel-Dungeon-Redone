@@ -60,6 +60,10 @@ Yêu cầu: JDK 17.
 - [Recommended changes](docs/recommended-changes.md)
 - [Changelog](CHANGELOG.md)
 
+### Codex workflow
+
+- [Project feature workflow skill](.codex/skills/citnutpd-feature-workflow/SKILL.md)
+
 ### Công cụ
 
 - [ModKit tool README](tools/modkit/README.md)
