@@ -22,10 +22,16 @@ public class WndMods extends Window {
 	private static final int BTN_HEIGHT = 16;
 	private static final int GAP = 2;
 
+	private final boolean inRunContext;
 	private final ArrayList<ModEntry> entries = new ArrayList<>();
 
 	public WndMods() {
+		this(false);
+	}
+
+	public WndMods(boolean inRunContext) {
 		super();
+		this.inRunContext = inRunContext;
 
 		resize(WIDTH, HEIGHT);
 
@@ -86,6 +92,10 @@ public class WndMods extends Window {
 			@Override
 			protected void onClick() {
 				super.onClick();
+				if (WndMods.this.inRunContext) {
+					GLog.i(Messages.get(WndMods.this, "apply_next_run"));
+					return;
+				}
 				ModManager.reload();
 			}
 		};
@@ -97,6 +107,10 @@ public class WndMods extends Window {
 			protected void onClick() {
 				super.onClick();
 				ModManager.clearCache();
+				if (WndMods.this.inRunContext) {
+					GLog.i(Messages.get(WndMods.this, "apply_next_run"));
+					return;
+				}
 				ModManager.reload();
 			}
 		};
@@ -125,6 +139,10 @@ public class WndMods extends Window {
 			toggle = new CheckBox(info.name) {
 				@Override
 				protected void onClick() {
+					if (WndMods.this.inRunContext) {
+						GLog.w(Messages.get(WndMods.this, "toggle_locked"));
+						return;
+					}
 					super.onClick();
 					if (ModManager.setEnabled(info, checked())) {
 						info.enabled = checked();
@@ -160,7 +178,7 @@ public class WndMods extends Window {
 			public void run() {
 				hide();
 			}
-		});
+		}, !inRunContext);
 		add(details);
 	}
 
@@ -171,8 +189,12 @@ public class WndMods extends Window {
 				boolean ok = ModManager.importPath(path.trim());
 				if (ok) {
 					GLog.p(Messages.get(WndMods.this, "import_success"));
-					ModManager.reload();
-					hide();
+					if (WndMods.this.inRunContext) {
+						GLog.i(Messages.get(WndMods.this, "apply_next_run"));
+					} else {
+						ModManager.reload();
+						hide();
+					}
 				} else {
 					GLog.w(Messages.get(WndMods.this, "import_fail"));
 				}
@@ -191,8 +213,12 @@ public class WndMods extends Window {
 				boolean ok = ModManager.importPath(text.trim());
 				if (ok) {
 					GLog.p(Messages.get(WndMods.this, "import_success"));
-					ModManager.reload();
-					hide();
+					if (WndMods.this.inRunContext) {
+						GLog.i(Messages.get(WndMods.this, "apply_next_run"));
+					} else {
+						ModManager.reload();
+						hide();
+					}
 				} else {
 					GLog.w(Messages.get(WndMods.this, "import_fail"));
 				}

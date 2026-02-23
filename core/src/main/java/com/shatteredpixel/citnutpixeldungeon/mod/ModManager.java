@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.shatteredpixel.citnutpixeldungeon.GamesInProgress;
 import com.shatteredpixel.citnutpixeldungeon.items.Generator;
 import com.shatteredpixel.citnutpixeldungeon.items.Item;
 import com.shatteredpixel.citnutpixeldungeon.sprites.ItemSpriteSheet;
@@ -13,24 +14,30 @@ import com.watabou.utils.FileUtils;
 import com.watabou.utils.Random;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public final class ModManager {
 	private static final String MODS_DIR = "mods";
+	private static final String SNAPSHOT_DIR = "mods_snapshot";
 	private static final String MODS_CACHE_DIR = ".cache";
 	private static final String MOD_FILE = "mod.json";
 	private static final String MOD_STATE_FILE = "mod.enabled";
 	private static final String MOD_CACHE_META = "mod.cache";
 	private static final int MOD_API_VERSION = 1;
+	public static final String MOD_PROFILE_MISSING_ERROR = "mod_profile_missing";
 
 	public static final int DELETE_FAILED = 0;
 	public static final int DELETE_OK = 1;
@@ -40,6 +47,21 @@ public final class ModManager {
 	private static final HashMap<String, ModItemFactory> factoriesById = new HashMap<>();
 	private static final EnumMap<Generator.Category, ArrayList<ModEntry>> itemsByCategory =
 			new EnumMap<>(Generator.Category.class);
+
+	private enum RuntimeMode {
+		GLOBAL,
+		SNAPSHOT
+	}
+
+	private static class RuntimeModProfile {
+		String id;
+		String version;
+		FileHandle modDir;
+	}
+
+	private static RuntimeMode runtimeMode = RuntimeMode.GLOBAL;
+	private static int runtimeSlot = -1;
+	private static final ArrayList<RuntimeModProfile> runtimeProfiles = new ArrayList<>();
 	private static boolean loaded = false;
 
 	private ModManager() {}
@@ -65,6 +87,12 @@ public final class ModManager {
 		public String description;
 		public String author;
 		public String homepage;
+		public String modPath;
+		public String sourcePath;
+		public String entrypoint;
+		public String entryPackage;
+		public String entryClass;
+		public String jar;
 		public FileHandle icon;
 		public ArrayList<ModItemDef> items = new ArrayList<>();
 	}
@@ -73,14 +101,21 @@ public final class ModManager {
 		if (loaded) return;
 		loaded = true;
 
+		loadRuntimeContext();
+	}
+
+	private static void loadRuntimeContext() {
 		itemsById.clear();
 		factoriesById.clear();
 		itemsByCategory.clear();
+		runtimeProfiles.clear();
 
-		FileHandle modsRoot = FileUtils.getFileHandle(MODS_DIR);
+		FileHandle modsRoot = runtimeRoot();
 		if (modsRoot == null) return;
 		if (!modsRoot.exists()) {
-			modsRoot.mkdirs();
+			if (runtimeMode == RuntimeMode.GLOBAL) {
+				modsRoot.mkdirs();
+			}
 			return;
 		}
 
@@ -89,17 +124,125 @@ public final class ModManager {
 			if (!manifest.exists()) continue;
 
 			try {
-				loadMod(modDir, manifest);
+				loadMod(modDir, manifest, runtimeProfiles);
 			} catch (Exception e) {
 				DeviceCompat.log("ModManager", "Failed to load mod in " + modDir.path());
 				Game.reportException(e);
 			}
 		}
+
+		Collections.sort(runtimeProfiles, (a, b) -> {
+			String ida = a.id == null ? "" : a.id.toLowerCase(Locale.ROOT);
+			String idb = b.id == null ? "" : b.id.toLowerCase(Locale.ROOT);
+			int idCmp = ida.compareTo(idb);
+			if (idCmp != 0) return idCmp;
+			String va = a.version == null ? "" : a.version;
+			String vb = b.version == null ? "" : b.version;
+			return va.compareTo(vb);
+		});
 	}
 
 	public static void reload() {
 		loaded = false;
 		load();
+	}
+
+	public static void activateGlobalRuntime() {
+		runtimeMode = RuntimeMode.GLOBAL;
+		runtimeSlot = -1;
+		reload();
+	}
+
+	public static boolean activateRuntimeForSaveSlot(int slot) {
+		if (slot <= 0) return false;
+		FileHandle snapshotRoot = snapshotRoot(slot);
+		if (snapshotRoot == null || !snapshotRoot.exists() || !snapshotRoot.isDirectory()) return false;
+
+		runtimeMode = RuntimeMode.SNAPSHOT;
+		runtimeSlot = slot;
+		reload();
+		return true;
+	}
+
+	public static void beginSnapshotRunForSlot(int slot) throws IOException {
+		if (slot <= 0) throw new IOException("invalid save slot");
+
+		FileHandle dstRoot = snapshotRoot(slot);
+		if (dstRoot == null) throw new IOException("unable to access snapshot folder");
+
+		deleteRecursively(dstRoot);
+		dstRoot.mkdirs();
+
+		int index = 0;
+		for (RuntimeModProfile profile : runtimeProfiles) {
+			if (profile == null || profile.modDir == null || !profile.modDir.exists()) continue;
+			String folderName = sanitizeSnapshotFolderName(profile.id, index);
+			FileHandle dst = dstRoot.child(folderName);
+			copyRecursively(profile.modDir, dst);
+			index++;
+		}
+
+		if (!activateRuntimeForSaveSlot(slot)) {
+			throw new IOException(MOD_PROFILE_MISSING_ERROR);
+		}
+	}
+
+	public static boolean isRuntimeSnapshotMode() {
+		return runtimeMode == RuntimeMode.SNAPSHOT;
+	}
+
+	public static String[] getRuntimeProfileIds() {
+		String[] ids = new String[runtimeProfiles.size()];
+		for (int i = 0; i < runtimeProfiles.size(); i++) {
+			ids[i] = runtimeProfiles.get(i).id == null ? "" : runtimeProfiles.get(i).id;
+		}
+		return ids;
+	}
+
+	public static String[] getRuntimeProfileVersions() {
+		String[] versions = new String[runtimeProfiles.size()];
+		for (int i = 0; i < runtimeProfiles.size(); i++) {
+			versions[i] = runtimeProfiles.get(i).version == null ? "" : runtimeProfiles.get(i).version;
+		}
+		return versions;
+	}
+
+	public static boolean validateSnapshotForSlot(int slot, String[] ids, String[] versions) {
+		if (slot <= 0 || ids == null || versions == null || ids.length != versions.length) {
+			return false;
+		}
+
+		FileHandle root = snapshotRoot(slot);
+		if (root == null || !root.exists() || !root.isDirectory()) return false;
+
+		HashMap<String, String> expected = new HashMap<>();
+		for (int i = 0; i < ids.length; i++) {
+			String id = ids[i] == null ? "" : ids[i].trim();
+			String version = versions[i] == null ? "" : versions[i].trim();
+			if (id.isEmpty() || expected.containsKey(id)) return false;
+			expected.put(id, version);
+		}
+
+		ArrayList<RuntimeModProfile> actual = collectEnabledProfiles(root);
+		if (actual.size() != expected.size()) return false;
+
+		HashSet<String> seen = new HashSet<>();
+		for (RuntimeModProfile profile : actual) {
+			if (profile == null || profile.id == null) return false;
+			String id = profile.id.trim();
+			if (id.isEmpty()) return false;
+			if (!expected.containsKey(id)) return false;
+			String expectedVersion = expected.get(id);
+			String actualVersion = profile.version == null ? "" : profile.version.trim();
+			if (!actualVersion.equals(expectedVersion)) return false;
+			seen.add(id);
+		}
+		return seen.size() == expected.size();
+	}
+
+	public static void deleteSnapshotForSlot(int slot) {
+		if (slot <= 0) return;
+		deleteRecursively(snapshotRoot(slot));
 	}
 
 	public static ArrayList<ModInfo> listMods() {
@@ -171,6 +314,36 @@ public final class ModManager {
 			data.description = root.getString("description", "");
 			data.author = root.getString("author", "");
 			data.homepage = root.getString("homepage", "");
+			data.modPath = absolutePath(modDir);
+
+			FileHandle cacheRoot = findCacheRoot(modDir);
+			FileHandle source = getCacheSource(cacheRoot);
+			if (source != null) {
+				data.sourcePath = absolutePath(source);
+			}
+
+			String entrypoint = root.getString("entrypoint", null);
+			if (entrypoint != null) {
+				entrypoint = entrypoint.trim();
+				if (!entrypoint.isEmpty()) {
+					data.entrypoint = entrypoint;
+					int dot = entrypoint.lastIndexOf('.');
+					if (dot > 0 && dot < entrypoint.length() - 1) {
+						data.entryPackage = entrypoint.substring(0, dot);
+						data.entryClass = entrypoint.substring(dot + 1);
+					} else {
+						data.entryClass = entrypoint;
+					}
+				}
+			}
+
+			String jar = root.getString("jar", null);
+			if (jar != null) {
+				jar = jar.trim();
+				if (!jar.isEmpty()) {
+					data.jar = jar;
+				}
+			}
 
 			String iconPath = root.getString("icon", null);
 			if (iconPath != null && !iconPath.trim().isEmpty()) {
@@ -321,7 +494,7 @@ public final class ModManager {
 		return createItem(entries.get(pickIndex - 1));
 	}
 
-	private static void loadMod(FileHandle modDir, FileHandle manifest) {
+	private static void loadMod(FileHandle modDir, FileHandle manifest, ArrayList<RuntimeModProfile> profileCollector) {
 		JsonValue root = new JsonReader().parse(manifest);
 		int apiVersion = root.getInt("api_version", MOD_API_VERSION);
 		if (apiVersion != MOD_API_VERSION) {
@@ -352,6 +525,7 @@ public final class ModManager {
 
 		String modId = root.getString("id", modDir.name());
 		String modName = root.getString("name", modId);
+		String modVersion = root.getString("version", "");
 		ModRegistry registry = new ModRegistry(modId);
 
 		loadCodeMod(modDir, root, registry);
@@ -373,6 +547,14 @@ public final class ModManager {
 					DeviceCompat.log("ModManager", "Duplicate or invalid mod item id: " + def.id);
 				}
 			}
+		}
+
+		if (profileCollector != null) {
+			RuntimeModProfile profile = new RuntimeModProfile();
+			profile.id = modId;
+			profile.version = modVersion;
+			profile.modDir = modDir;
+			profileCollector.add(profile);
 		}
 	}
 
@@ -750,6 +932,25 @@ public final class ModManager {
 		handle.delete();
 	}
 
+	private static void copyRecursively(FileHandle src, FileHandle dst) throws IOException {
+		if (src == null || !src.exists()) return;
+		try {
+			if (src.isDirectory()) {
+				dst.mkdirs();
+				for (FileHandle child : src.list()) {
+					copyRecursively(child, dst.child(child.name()));
+				}
+			} else {
+				dst.parent().mkdirs();
+				try (InputStream in = src.read()) {
+					dst.write(in, false);
+				}
+			}
+		} catch (Exception e) {
+			throw new IOException("failed to copy mod snapshot: " + src.path(), e);
+		}
+	}
+
 	private static FileHandle findCacheRoot(FileHandle modDir) {
 		FileHandle current = modDir;
 		for (int i = 0; i < 8 && current != null; i++) {
@@ -805,6 +1006,69 @@ public final class ModManager {
 
 	private static FileHandle enabledOverrideFile(FileHandle modDir) {
 		return modDir.child(MOD_STATE_FILE);
+	}
+
+	private static FileHandle runtimeRoot() {
+		if (runtimeMode == RuntimeMode.SNAPSHOT && runtimeSlot > 0) {
+			return snapshotRoot(runtimeSlot);
+		}
+		return FileUtils.getFileHandle(MODS_DIR);
+	}
+
+	private static String snapshotPath(int slot) {
+		return GamesInProgress.gameFolder(slot) + "/" + SNAPSHOT_DIR;
+	}
+
+	private static FileHandle snapshotRoot(int slot) {
+		return FileUtils.getFileHandle(snapshotPath(slot));
+	}
+
+	private static String sanitizeSnapshotFolderName(String modId, int index) {
+		String base = modId == null ? "mod" : modId.trim();
+		if (base.isEmpty()) base = "mod";
+		base = base.replaceAll("[^a-zA-Z0-9._-]", "_");
+		return base + "_" + index;
+	}
+
+	private static ArrayList<RuntimeModProfile> collectEnabledProfiles(FileHandle modsRoot) {
+		ArrayList<RuntimeModProfile> result = new ArrayList<>();
+		if (modsRoot == null || !modsRoot.exists() || !modsRoot.isDirectory()) {
+			return result;
+		}
+		for (FileHandle modDir : discoverModRoots(modsRoot)) {
+			FileHandle manifest = modDir.child(MOD_FILE);
+			if (!manifest.exists()) continue;
+			try {
+				JsonValue root = new JsonReader().parse(manifest);
+				boolean enabled = root.getBoolean("enabled", true);
+				Boolean override = readEnabledOverride(modDir);
+				if (override != null) {
+					enabled = override;
+				}
+				if (!enabled) continue;
+
+				RuntimeModProfile profile = new RuntimeModProfile();
+				profile.id = root.getString("id", modDir.name());
+				profile.version = root.getString("version", "");
+				profile.modDir = modDir;
+				result.add(profile);
+			} catch (Exception e) {
+				DeviceCompat.log("ModManager", "Failed to read mod profile in " + modDir.path());
+			}
+		}
+		return result;
+	}
+
+	private static String absolutePath(FileHandle handle) {
+		if (handle == null) return null;
+		try {
+			File file = handle.file();
+			if (file != null) {
+				return file.getAbsolutePath();
+			}
+		} catch (Exception ignored) {
+		}
+		return handle.path();
 	}
 
 	public static Item createItemPreview(ModItemDef def) {

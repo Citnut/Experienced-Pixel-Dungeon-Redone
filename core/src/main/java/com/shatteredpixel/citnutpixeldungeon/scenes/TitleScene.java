@@ -35,6 +35,7 @@ import com.shatteredpixel.citnutpixeldungeon.effects.BannerSprites;
 import com.shatteredpixel.citnutpixeldungeon.effects.Fireball;
 import com.shatteredpixel.citnutpixeldungeon.messages.Languages;
 import com.shatteredpixel.citnutpixeldungeon.messages.Messages;
+import com.shatteredpixel.citnutpixeldungeon.mod.ModManager;
 import com.shatteredpixel.citnutpixeldungeon.services.news.News;
 import com.shatteredpixel.citnutpixeldungeon.services.updates.AvailableUpdateData;
 import com.shatteredpixel.citnutpixeldungeon.services.updates.Updates;
@@ -62,6 +63,7 @@ public class TitleScene extends PixelScene {
 	public void create() {
 		
 		super.create();
+		ModManager.activateGlobalRuntime();
 
 		Music.INSTANCE.playTracks(
 				new String[]{Assets.Music.THEME_1, Assets.Music.THEME_2},

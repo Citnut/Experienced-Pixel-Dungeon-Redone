@@ -81,6 +81,7 @@ import com.shatteredpixel.citnutpixeldungeon.levels.features.LevelTransition;
 import com.shatteredpixel.citnutpixeldungeon.levels.rooms.secret.SecretRoom;
 import com.shatteredpixel.citnutpixeldungeon.levels.rooms.special.SpecialRoom;
 import com.shatteredpixel.citnutpixeldungeon.messages.Messages;
+import com.shatteredpixel.citnutpixeldungeon.mod.ModManager;
 import com.shatteredpixel.citnutpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.citnutpixeldungeon.scenes.InterlevelScene;
 import com.shatteredpixel.citnutpixeldungeon.ui.GameLog;
@@ -749,6 +750,9 @@ public class Dungeon {
 	private static final String CUSTOM_SEED	= "custom_seed";
 	private static final String DAILY	    = "daily";
 	private static final String DAILY_REPLAY= "daily_replay";
+	private static final String MOD_PROFILE_IDS = "mod_profile_ids";
+	private static final String MOD_PROFILE_VERSIONS = "mod_profile_versions";
+	private static final String MOD_PROFILE_SNAPSHOT = "mod_profile_snapshot";
 	private static final String CHALLENGES	= "challenges";
 	private static final String MOBS_TO_CHAMPION	= "mobs_to_champion";
 	private static final String HERO		= "hero";
@@ -782,6 +786,9 @@ public class Dungeon {
 			bundle.put( CUSTOM_SEED, customSeedText );
 			bundle.put( DAILY, daily );
 			bundle.put( DAILY_REPLAY, dailyReplay );
+			bundle.put( MOD_PROFILE_IDS, ModManager.getRuntimeProfileIds() );
+			bundle.put( MOD_PROFILE_VERSIONS, ModManager.getRuntimeProfileVersions() );
+			bundle.put( MOD_PROFILE_SNAPSHOT, ModManager.isRuntimeSnapshotMode() );
 			bundle.put( CHALLENGES, challenges );
 			bundle.put( MOBS_TO_CHAMPION, mobsToChampion );
 			bundle.put( HERO, hero );
@@ -1041,6 +1048,7 @@ public class Dungeon {
 				}
 			}
 		}
+		ModManager.deleteSnapshotForSlot(save);
 
 		FileUtils.overwriteFile(GamesInProgress.gameFile(save), 1);
 
@@ -1056,6 +1064,9 @@ public class Dungeon {
 		info.customSeed = bundle.getString( CUSTOM_SEED );
 		info.daily = bundle.getBoolean( DAILY );
 		info.dailyReplay = bundle.getBoolean( DAILY_REPLAY );
+		info.modProfileSnapshot = bundle.getBoolean( MOD_PROFILE_SNAPSHOT );
+		info.modProfileIds = bundle.getStringArray( MOD_PROFILE_IDS );
+		info.modProfileVersions = bundle.getStringArray( MOD_PROFILE_VERSIONS );
 
 		Hero.preview( info, bundle.getBundle( HERO ) );
 		Statistics.preview( info, bundle );

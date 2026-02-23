@@ -27,6 +27,7 @@ package com.shatteredpixel.citnutpixeldungeon;
 import com.shatteredpixel.citnutpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.citnutpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.citnutpixeldungeon.messages.Messages;
+import com.shatteredpixel.citnutpixeldungeon.mod.ModManager;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.FileUtils;
 
@@ -155,6 +156,9 @@ public class GamesInProgress {
 		
 		info.goldCollected = Statistics.goldCollected;
 		info.maxDepth = Statistics.deepestFloor;
+		info.modProfileSnapshot = ModManager.isRuntimeSnapshotMode();
+		info.modProfileIds = ModManager.getRuntimeProfileIds();
+		info.modProfileVersions = ModManager.getRuntimeProfileVersions();
 
 		slotStates.put( slot, info );
 	}
@@ -193,6 +197,10 @@ public class GamesInProgress {
 		
 		public long goldCollected;
 		public int maxDepth;
+
+		public boolean modProfileSnapshot;
+		public String[] modProfileIds;
+		public String[] modProfileVersions;
 	}
 	
 	public static final Comparator<GamesInProgress.Info> scoreComparator = new Comparator<GamesInProgress.Info>() {

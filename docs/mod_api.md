@@ -208,9 +208,16 @@ public class MyMod implements GameMod {
 }
 ```
 
-## 7. Bật/tắt mod
+## 7. Bật/tắt mod và snapshot theo save
 
-Trạng thái mod được lưu ở file `mod.enabled` trong thư mục mod (hoặc cache nếu là zip). Tắt mod trong menu **Settings > Data > Mods**.
+- Trạng thái bật/tắt global được lưu ở file `mod.enabled` trong thư mục mod (hoặc cache nếu là zip).
+- Bật/tắt mod trong menu **Settings > Data > Mods** tại menu chính.
+- Khi bắt đầu run mới, game snapshot toàn bộ mod active vào `game<slot>/mods_snapshot/`.
+- Save lưu profile mod (`id`, `version`) và dùng profile đó để kiểm tra khi Continue.
+- Nếu snapshot/profile không khớp hoặc bị thiếu, save sẽ không Continue được cho tới khi khôi phục đúng dữ liệu mod.
+- Khi đang ở run:
+  - Không thể disable/uninstall mod.
+  - Import/Reload/Clear Cache chỉ ảnh hưởng run sau.
 
 ## 8. Gợi ý đóng gói
 

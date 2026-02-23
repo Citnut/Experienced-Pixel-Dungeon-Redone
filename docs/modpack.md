@@ -12,7 +12,20 @@ Game sẽ đọc mod từ thư mục `mods` trong **thư mục dữ liệu của
 
 Trong đó `<vendor>` và `<title>` là thông tin package của bản build (được game dùng cho lưu save).
 
-Bạn có thể bật/tắt mod trong **Settings → Data → Mods**.
+Bạn có thể bật/tắt mod trong **Settings → Data → Mods** ở menu chính.
+
+## 1.2 Mod gắn theo save (snapshot runtime)
+
+- Khi bắt đầu một run mới, game sẽ chụp snapshot các mod đang active vào:
+  - `game<slot>/mods_snapshot/`
+- Save sẽ lưu profile mod (`id` + `version`) để kiểm tra nhất quán khi Continue.
+- Khi Continue:
+  - Game tự nạp đúng snapshot của save.
+  - Nếu snapshot thiếu/hỏng hoặc lệch profile, save sẽ bị chặn cho tới khi khôi phục đúng mod.
+- Trong lúc đang chơi:
+  - Không thể **disable** hoặc **uninstall** mod.
+  - **Import / Reload / Clear Cache** chỉ áp dụng cho các run sau, không đổi run hiện tại.
+- Save cũ (trước cơ chế snapshot) vẫn Continue theo cơ chế cũ để giữ tương thích.
 
 ## 1.1 Mod dạng `.zip` (tự cache)
 

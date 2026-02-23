@@ -67,6 +67,7 @@ This release introduces a first-party modding framework and in-game mod manageme
   - Ghost-text rendering support in text input widgets
   - Accept suggestion via `Tab` and `Right Arrow`
 - Expanded localization surface for new mod UI strings across language packs.
+- Synced EN/VI message parity across the existing message bundle (missing/extra key cleanup, added missing `services_vi.properties`).
 - New guidebook/modding journal support (`Document.GUIDE_MODS`).
 
 ### Modding
@@ -78,6 +79,7 @@ This release introduces a first-party modding framework and in-game mod manageme
   - Reload mods and clear mod cache
 - Added per-mod detail window (`WndModDetails`):
   - View mod metadata (id/version/author/homepage)
+  - Show mod path and code metadata (entrypoint/package/class/jar) when present
   - Inspect mod item definitions and preview item stats
   - Uninstall mod with confirmation flow
 - Integrated mod item generation into core loot generation path (`Generator.random*`).

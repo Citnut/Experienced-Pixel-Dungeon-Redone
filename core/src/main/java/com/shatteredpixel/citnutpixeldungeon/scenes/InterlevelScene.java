@@ -43,6 +43,7 @@ import com.shatteredpixel.citnutpixeldungeon.levels.features.Chasm;
 import com.shatteredpixel.citnutpixeldungeon.levels.features.LevelTransition;
 import com.shatteredpixel.citnutpixeldungeon.levels.rooms.special.SpecialRoom;
 import com.shatteredpixel.citnutpixeldungeon.messages.Messages;
+import com.shatteredpixel.citnutpixeldungeon.mod.ModManager;
 import com.shatteredpixel.citnutpixeldungeon.ui.GameLog;
 import com.shatteredpixel.citnutpixeldungeon.ui.IconButton;
 import com.shatteredpixel.citnutpixeldungeon.ui.Icons;
@@ -548,6 +549,9 @@ public class InterlevelScene extends PixelScene {
 			if (error != null) {
 				String errorMsg;
 				if (error instanceof FileNotFoundException)     errorMsg = Messages.get(this, "file_not_found");
+				else if (ModManager.MOD_PROFILE_MISSING_ERROR.equals(error.getMessage())) {
+					errorMsg = Messages.get(this, "mod_profile_missing");
+				}
 				else if (error instanceof IOException)          errorMsg = Messages.get(this, "io_error");
 				else if (error.getMessage() != null &&
 						error.getMessage().equals("old save")) errorMsg = Messages.get(this, "io_error");
@@ -608,6 +612,7 @@ public class InterlevelScene extends PixelScene {
 
 		if (Dungeon.hero == null) {
 			Mob.clearHeldAllies();
+			ModManager.beginSnapshotRunForSlot(GamesInProgress.curSlot);
 			Dungeon.init();
 			GameLog.wipe();
 
@@ -710,14 +715,35 @@ public class InterlevelScene extends PixelScene {
 		Mob.clearHeldAllies();
 
 		GameLog.wipe();
+		ModManager.activateGlobalRuntime();
 
-		Dungeon.loadGame( GamesInProgress.curSlot );
-		if (Dungeon.depth == -1) {
-			Dungeon.depth = Statistics.deepestFloor;
-			Dungeon.switchLevel( Dungeon.loadLevel( GamesInProgress.curSlot ), -1 );
-		} else {
-			Level level = Dungeon.loadLevel( GamesInProgress.curSlot );
-			Dungeon.switchLevel( level, Dungeon.hero.pos );
+		GamesInProgress.Info info = GamesInProgress.check(GamesInProgress.curSlot);
+		if (info != null && info.modProfileSnapshot) {
+			boolean valid = ModManager.validateSnapshotForSlot(
+					GamesInProgress.curSlot,
+					info.modProfileIds,
+					info.modProfileVersions
+			);
+			if (!valid || !ModManager.activateRuntimeForSaveSlot(GamesInProgress.curSlot)) {
+				throw new IOException(ModManager.MOD_PROFILE_MISSING_ERROR);
+			}
+		}
+
+		try {
+			Dungeon.loadGame( GamesInProgress.curSlot );
+			if (Dungeon.depth == -1) {
+				Dungeon.depth = Statistics.deepestFloor;
+				Dungeon.switchLevel( Dungeon.loadLevel( GamesInProgress.curSlot ), -1 );
+			} else {
+				Level level = Dungeon.loadLevel( GamesInProgress.curSlot );
+				Dungeon.switchLevel( level, Dungeon.hero.pos );
+			}
+		} catch (IOException e) {
+			ModManager.activateGlobalRuntime();
+			throw e;
+		} catch (RuntimeException e) {
+			ModManager.activateGlobalRuntime();
+			throw e;
 		}
 	}
 	

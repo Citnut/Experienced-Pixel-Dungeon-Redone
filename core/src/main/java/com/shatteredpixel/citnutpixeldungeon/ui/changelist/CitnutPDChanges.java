@@ -48,7 +48,9 @@ public class CitnutPDChanges {
 				"Added/expanded CitnutPD mod-facing systems:\n" +
 						"_-_ dedicated mod UI flow (mod list/detail windows)\n" +
 						"_-_ baseline hooks for mod package loading and registration\n" +
-						"_-_ initial documentation/templates for mod authors"));
+						"_-_ initial documentation/templates for mod authors\n" +
+						"_-_ mod-details-metadata: details window now shows mod path plus code entrypoint/package/class when available\n" +
+						"_-_ save-attached-mod-snapshots: each save now keeps a locked mod snapshot, and active-run mod toggles/uninstall are blocked"));
 
 		changes.addButton(new ChangeButton(Icons.get(Icons.INFO), "ScrollOfDebug",
 				"ScrollOfDebug maintenance and feature work:\n" +
@@ -68,6 +70,7 @@ public class CitnutPDChanges {
 				"Translation pass and message maintenance:\n" +
 						"_-_ updated many journal/window message files\n" +
 						"_-_ synced strings after upstream merges\n" +
+						"_-_ vi-en-parity-sync: resolved existing Vietnamese key/file mismatches against English bases\n" +
 						"_-_ where translation is missing, text intentionally stays in English"));
 
 		changes.addButton(new ChangeButton(Icons.get(Icons.NEWS), "Upstream Sync",

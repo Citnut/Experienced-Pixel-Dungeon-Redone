@@ -26,6 +26,10 @@ public class WndModDetails extends Window {
 	private static final int GAP = 2;
 
 	public WndModDetails(ModManager.ModInfo info, Runnable onRemoved) {
+		this(info, onRemoved, true);
+	}
+
+	public WndModDetails(ModManager.ModInfo info, Runnable onRemoved, boolean allowUninstall) {
 		super();
 		resize(WIDTH, HEIGHT);
 
@@ -34,7 +38,7 @@ public class WndModDetails extends Window {
 			RenderedTextBlock none = PixelScene.renderTextBlock(Messages.get(this, "missing"), 8);
 			none.setPos((WIDTH - none.width()) / 2f, GAP);
 			add(none);
-			layoutButtons(onRemoved, info, null);
+			layoutButtons(onRemoved, info, allowUninstall);
 			return;
 		}
 
@@ -94,15 +98,19 @@ public class WndModDetails extends Window {
 		}
 
 		content.setSize(WIDTH, Math.max(listPos, pane.height()));
-		layoutButtons(onRemoved, info, data);
+		layoutButtons(onRemoved, info, allowUninstall);
 	}
 
-	private void layoutButtons(Runnable onRemoved, ModManager.ModInfo info, ModManager.ModData data) {
+	private void layoutButtons(Runnable onRemoved, ModManager.ModInfo info, boolean allowUninstall) {
 		float btnWidth = (WIDTH - 2) / 2f;
 
 		RedButton btnRemove = new RedButton(Messages.get(this, "uninstall")) {
 			@Override
 			protected void onClick() {
+				if (!allowUninstall) {
+					GLog.w(Messages.get(WndModDetails.this, "uninstall_locked"));
+					return;
+				}
 				super.onClick();
 				WndOptions confirm = new WndOptions(
 						Messages.get(WndModDetails.this, "confirm_title"),
@@ -132,6 +140,7 @@ public class WndModDetails extends Window {
 			}
 		};
 		btnRemove.setRect(0, HEIGHT - BTN_HEIGHT, btnWidth, BTN_HEIGHT);
+		btnRemove.enable(allowUninstall);
 		add(btnRemove);
 
 		RedButton btnClose = new RedButton(Messages.get(this, "close")) {
@@ -158,6 +167,25 @@ public class WndModDetails extends Window {
 		}
 		if (data.homepage != null && !data.homepage.trim().isEmpty()) {
 			sb.append("\n").append(Messages.get(WndModDetails.class, "homepage")).append(": ").append(data.homepage);
+		}
+		if (data.modPath != null && !data.modPath.trim().isEmpty()) {
+			sb.append("\n").append(Messages.get(WndModDetails.class, "mod_path")).append(": ").append(data.modPath);
+		}
+		if (data.sourcePath != null && !data.sourcePath.trim().isEmpty()
+				&& (data.modPath == null || !data.sourcePath.equals(data.modPath))) {
+			sb.append("\n").append(Messages.get(WndModDetails.class, "source_path")).append(": ").append(data.sourcePath);
+		}
+		if (data.entrypoint != null && !data.entrypoint.trim().isEmpty()) {
+			sb.append("\n").append(Messages.get(WndModDetails.class, "entrypoint")).append(": ").append(data.entrypoint);
+		}
+		if (data.entryPackage != null && !data.entryPackage.trim().isEmpty()) {
+			sb.append("\n").append(Messages.get(WndModDetails.class, "entry_package")).append(": ").append(data.entryPackage);
+		}
+		if (data.entryClass != null && !data.entryClass.trim().isEmpty()) {
+			sb.append("\n").append(Messages.get(WndModDetails.class, "entry_class")).append(": ").append(data.entryClass);
+		}
+		if (data.jar != null && !data.jar.trim().isEmpty()) {
+			sb.append("\n").append(Messages.get(WndModDetails.class, "jar")).append(": ").append(data.jar);
 		}
 		return sb.toString();
 	}

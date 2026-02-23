@@ -889,7 +889,8 @@ public class WndSettings extends WndTabbed {
 				@Override
 				protected void onClick() {
 					super.onClick();
-					ShatteredPixelDungeon.scene().add(new WndMods());
+					boolean inRun = ShatteredPixelDungeon.scene() instanceof GameScene;
+					ShatteredPixelDungeon.scene().add(new WndMods(inRun));
 				}
 			};
 			add(btnMods);
