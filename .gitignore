@@ -20,3 +20,6 @@ local.properties
 *.idea
 /android/debug/
 /core/src/main/assets/music/desktop.ini
+
+# tmp files
+.citnut
